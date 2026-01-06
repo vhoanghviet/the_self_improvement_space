@@ -9,11 +9,11 @@
     
     <style>
         :root {
-            --bg-dark: #0f172a; /* Xanh đen thẳm */
-            --glass-bg: rgba(30, 41, 59, 0.7); /* Kính mờ */
+            --bg-dark: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.7);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --accent: #22d3ee; /* Cyan Neon */
-            --secondary: #a855f7; /* Purple Neon */
+            --accent: #22d3ee;
+            --secondary: #a855f7;
             --text-main: #f1f5f9;
             --text-muted: #94a3b8;
             --success: #34d399;
@@ -33,7 +33,6 @@
             min-height: 100vh;
         }
 
-        /* --- Header Card --- */
         .header {
             width: 100%;
             max-width: 600px;
@@ -52,7 +51,6 @@
 
         h2 { margin: 0; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(to right, var(--accent), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        /* --- Level Badge & XP --- */
         .level-info { text-align: right; }
         .level-badge {
             background: linear-gradient(135deg, var(--accent), var(--secondary));
@@ -80,7 +78,6 @@
             box-shadow: 0 0 8px var(--accent);
         }
 
-        /* --- Navigation Tabs --- */
         .nav-tabs {
             display: flex;
             gap: 10px;
@@ -109,7 +106,6 @@
             box-shadow: 0 0 15px rgba(255,255,255,0.3);
         }
 
-        /* --- Input Cards --- */
         .section { display: none; width: 100%; max-width: 600px; animation: slideUp 0.4s ease-out; }
         .section.active { display: block; }
 
@@ -124,12 +120,12 @@
             border-radius: 20px;
             border: 1px solid var(--glass-border);
             margin-bottom: 20px;
+            backdrop-filter: blur(12px);
         }
 
         .card h3 { margin-top: 0; font-size: 1.2em; display: flex; align-items: center; gap: 10px; }
         .card h3 i { color: var(--accent); }
 
-        /* Inputs Styling */
         input, select, textarea {
             width: 100%;
             padding: 12px 15px;
@@ -148,7 +144,6 @@
             box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2);
         }
 
-        /* Buttons */
         button.action-btn {
             background: linear-gradient(135deg, var(--accent), #3b82f6);
             color: white;
@@ -168,7 +163,6 @@
         }
         button.action-btn:active { transform: translateY(0); }
 
-        /* --- Log Items --- */
         .log-item {
             background: rgba(0,0,0,0.2);
             padding: 15px;
@@ -179,8 +173,59 @@
             line-height: 1.5;
             display: flex;
             flex-direction: column;
+            animation: slideIn 0.3s ease-out;
         }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
         .log-date { font-size: 0.75em; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;}
+
+        .xp-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--success), #10b981);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(52, 211, 153, 0.4);
+            animation: popIn 0.5s ease-out;
+            z-index: 1000;
+        }
+
+        @keyframes popIn {
+            0% { transform: translateY(-100px) scale(0.8); opacity: 0; }
+            50% { transform: translateY(10px) scale(1.05); }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .stat-card {
+            background: rgba(0,0,0,0.2);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .stat-card h4 {
+            margin: 0 0 10px 0;
+            color: var(--accent);
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
     </style>
 </head>
 <body>
@@ -257,11 +302,253 @@
 
     <div id="stats" class="section">
         <div class="card">
-            <h3><i class="fa-solid fa-database"></i> Dữ liệu của bạn</h3>
+            <h3><i class="fa-solid fa-chart-pie"></i> Thống Kê</h3>
+            <div class="stat-card">
+                <h4>📚 Tổng số phiên học</h4>
+                <div class="stat-value" id="statLearning">0</div>
+            </div>
+            <div class="stat-card">
+                <h4>💪 Tổng số set gym</h4>
+                <div class="stat-value" id="statGym">0</div>
+            </div>
+            <div class="stat-card">
+                <h4>🧘 Tổng số bài nhật ký</h4>
+                <div class="stat-value" id="statMind">0</div>
+            </div>
+        </div>
+        <div class="card">
+            <h3><i class="fa-solid fa-database"></i> Quản lý dữ liệu</h3>
             <p style="color: var(--text-muted); font-size: 0.9em;">Dữ liệu đang được lưu an toàn trong trình duyệt.</p>
             <button class="action-btn" style="background: linear-gradient(135deg, #ef4444, #b91c1c);" onclick="clearAllData()"><i class="fa-solid fa-trash"></i> Reset toàn bộ hành trình</button>
         </div>
     </div>
 
-    </body>
+    <script>
+        let userData = {
+            level: 1,
+            xp: 0,
+            learningLogs: [],
+            gymLogs: [],
+            mindLogs: []
+        };
+
+        function loadData() {
+            const saved = localStorage.getItem('lifeOSData');
+            if (saved) {
+                userData = JSON.parse(saved);
+            }
+            updateUI();
+            renderAllLogs();
+        }
+
+        function saveData() {
+            localStorage.setItem('lifeOSData', JSON.stringify(userData));
+        }
+
+        function updateUI() {
+            const xpForNextLevel = userData.level * 1000;
+            const xpProgress = (userData.xp / xpForNextLevel) * 100;
+            
+            document.getElementById('userLevel').textContent = `LVL ${userData.level}`;
+            document.getElementById('currentXP').textContent = userData.xp;
+            document.getElementById('nextLevelXP').textContent = xpForNextLevel;
+            document.getElementById('xpBar').style.width = xpProgress + '%';
+
+            document.getElementById('statLearning').textContent = userData.learningLogs.length;
+            document.getElementById('statGym').textContent = userData.gymLogs.length;
+            document.getElementById('statMind').textContent = userData.mindLogs.length;
+        }
+
+        function addXP(amount) {
+            userData.xp += amount;
+            const xpForNextLevel = userData.level * 1000;
+            
+            if (userData.xp >= xpForNextLevel) {
+                userData.level++;
+                userData.xp = userData.xp - xpForNextLevel;
+                showNotification(`🎉 LEVEL UP! Bạn đã đạt level ${userData.level}!`);
+            } else {
+                showNotification(`+${amount} XP 🌟`);
+            }
+            
+            updateUI();
+            saveData();
+        }
+
+        function showNotification(text) {
+            const notif = document.createElement('div');
+            notif.className = 'xp-notification';
+            notif.textContent = text;
+            document.body.appendChild(notif);
+            
+            setTimeout(() => {
+                notif.style.animation = 'popIn 0.3s ease-out reverse';
+                setTimeout(() => notif.remove(), 300);
+            }, 2000);
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function addLog(type) {
+            const timestamp = new Date().toLocaleString('vi-VN');
+            
+            if (type === 'learning') {
+                const subject = document.getElementById('learnSubject').value;
+                const duration = document.getElementById('learnDuration').value;
+                const rating = document.getElementById('learnRating').value;
+                const takeaway = document.getElementById('learnTakeaway').value;
+                
+                if (!subject || !duration) {
+                    alert('Vui lòng điền đầy đủ thông tin!');
+                    return;
+                }
+                
+                userData.learningLogs.unshift({
+                    timestamp,
+                    subject,
+                    duration,
+                    rating,
+                    takeaway
+                });
+                
+                document.getElementById('learnSubject').value = '';
+                document.getElementById('learnDuration').value = '';
+                document.getElementById('learnTakeaway').value = '';
+                
+                addXP(50);
+                renderLogs('learning');
+                
+            } else if (type === 'gym') {
+                const exercise = document.getElementById('gymExercise').value;
+                const kg = document.getElementById('gymKg').value;
+                const reps = document.getElementById('gymReps').value;
+                
+                if (!exercise || !kg || !reps) {
+                    alert('Vui lòng điền đầy đủ thông tin!');
+                    return;
+                }
+                
+                userData.gymLogs.unshift({
+                    timestamp,
+                    exercise,
+                    kg,
+                    reps
+                });
+                
+                document.getElementById('gymExercise').value = '';
+                document.getElementById('gymKg').value = '';
+                document.getElementById('gymReps').value = '';
+                
+                addXP(40);
+                renderLogs('gym');
+                
+            } else if (type === 'mind') {
+                const mindType = document.getElementById('mindType').options[document.getElementById('mindType').selectedIndex].text;
+                const content = document.getElementById('mindContent').value;
+                
+                if (!content) {
+                    alert('Vui lòng viết gì đó!');
+                    return;
+                }
+                
+                userData.mindLogs.unshift({
+                    timestamp,
+                    type: mindType,
+                    content
+                });
+                
+                document.getElementById('mindContent').value = '';
+                
+                addXP(30);
+                renderLogs('mind');
+            }
+            
+            saveData();
+        }
+
+        function renderLogs(type) {
+            let container, logs, html = '';
+            
+            if (type === 'learning') {
+                container = document.getElementById('learningLogs');
+                logs = userData.learningLogs;
+                
+                logs.forEach(log => {
+                    html += `
+                        <div class="log-item">
+                            <div class="log-date">${log.timestamp}</div>
+                            <strong>📚 ${log.subject}</strong>
+                            <div style="margin-top: 8px; color: var(--text-muted);">
+                                ⏱️ ${log.duration} phút • Đánh giá: ${log.rating}/5
+                            </div>
+                            ${log.takeaway ? `<div style="margin-top: 8px; font-style: italic;">"${log.takeaway}"</div>` : ''}
+                        </div>
+                    `;
+                });
+                
+            } else if (type === 'gym') {
+                container = document.getElementById('gymLogs');
+                logs = userData.gymLogs;
+                
+                logs.forEach(log => {
+                    html += `
+                        <div class="log-item">
+                            <div class="log-date">${log.timestamp}</div>
+                            <strong>💪 ${log.exercise}</strong>
+                            <div style="margin-top: 8px; color: var(--text-muted);">
+                                ${log.kg} kg × ${log.reps} reps
+                            </div>
+                        </div>
+                    `;
+                });
+                
+            } else if (type === 'mind') {
+                container = document.getElementById('mindLogs');
+                logs = userData.mindLogs;
+                
+                logs.forEach(log => {
+                    html += `
+                        <div class="log-item">
+                            <div class="log-date">${log.timestamp}</div>
+                            <strong>${log.type}</strong>
+                            <div style="margin-top: 8px; line-height: 1.6;">${log.content}</div>
+                        </div>
+                    `;
+                });
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function renderAllLogs() {
+            renderLogs('learning');
+            renderLogs('gym');
+            renderLogs('mind');
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ Bạn có chắc muốn reset toàn bộ dữ liệu? Hành động này không thể hoàn tác!')) {
+                localStorage.removeItem('lifeOSData');
+                userData = {
+                    level: 1,
+                    xp: 0,
+                    learningLogs: [],
+                    gymLogs: [],
+                    mindLogs: []
+                };
+                updateUI();
+                renderAllLogs();
+                showNotification('🔄 Đã reset toàn bộ dữ liệu!');
+            }
+        }
+
+        loadData();
+    </script>
+</body>
 </html>
