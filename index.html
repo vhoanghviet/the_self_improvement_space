@@ -1,570 +1,12 @@
-particle.style.animationDelay = Math.random() * 5 + 's';
-                document.body.appendChild(particle);
-            }
-        }
-
-        function loadData() {
-            const saved = localStorage.getItem('hexagonOS');
-            if (saved) {
-                const data = JSON.parse(saved);
-                
-                if (data.today !== new Date().toDateString()) {
-                    appData.lastActive = data.today;
-                    const daysDiff = Math.floor((new Date() - new Date(data.lastActive)) / (1000 * 60 * 60 * 24));
-                    
-                    if (daysDiff === 1) {
-                        appData.streak = data.streak + 1;
-                    } else if (daysDiff > 1) {
-                        appData.streak = 1;
-                    }
-                    
-                    appData.routine.forEach(r => r.done = false);
-                    appData.kohi.forEach(k => k.done = false);
-                    appData.hexagon = { STR: 0, SPR: 0, INT: 0, REC: 0, JOY: 0, WIL: 0 };
-                    appData.logs = data.logs || [];
-                } else {
-                    appData = { ...appData, ...data };
-                }
-            }
-        }
-
-        function saveData() {
-            appData.today = new Date().toDateString();
-            localStorage.setItem('hexagonOS', JSON.stringify(appData));
-        }
-
-        function updateDate() {
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('vi-VN', options);
-            document.getElementById('dayStreak').textContent = appData.streak;
-        }
-
-        function renderRoutine() {
-            const container = document.getElementById('routineList');
-            container.innerHTML = appData.routine.map(item => `
-                <div class="check-item ${item.done ? 'completed' : ''}" onclick="toggleRoutine('${item.id}')">
-                    <div class="checkbox">${item.done ? '<i class="fa-solid fa-check"></i>' : ''}</div>
-                    <span>${item.text}</span>
-                </div>
-            `).join('');
-            
-            const progress = Math.round((appData.routine.filter(r => r.done).length / appData.routine.length) * 100);
-            document.getElementById('routineProgress').textContent = progress + '%';
-        }
-
-        function toggleRoutine(id) {
-            const item = appData.routine.find(r => r.id === id);
-            item.done = !item.done;
-            renderRoutine();
-            saveData();
-        }
-
-        function renderKohi() {
-            const container = document.getElementById('kohiList');
-            container.innerHTML = appData.kohi.map(item => `
-                <div class="check-item ${item.done ? 'completed' : ''}" onclick="toggleKohi('${item.id}')">
-                    <div class="checkbox">${item.done ? '<i class="fa-solid fa-check"></i>' : ''}</div>
-                    <span>${item.text}</span>
-                </div>
-            `).join('');
-        }
-
-        function toggleKohi(id) {
-            const item = appData.kohi.find(k => k.id === id);
-            item.done = !item.done;
-            
-            const completed = appData.kohi.filter(k => k.done).length;
-            appData.hexagon.INT = Math.max(appData.hexagon.INT, completed * 15);
-            
-            renderKohi();
-            updateHexagonChart();
-            saveData();
-        }
-
-        function initHexagonChart() {
-            const ctx = document.getElementById('hexagonChart').getContext('2d');
-            hexagonChart = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: ['Strength', 'Spirit', 'Brain', 'Recovery', 'Joy', 'Willpower'],
-                    datasets: [{
-                        data: Object.values(appData.hexagon),
-                        backgroundColor: 'rgba(0, 217, 255, 0.3)',
-                        borderColor: '#00d9ff',
-                        borderWidth: 4,
-                        pointBackgroundColor: ['#ef4444', '#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ec4899'],
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 3,
-                        pointRadius: 8,
-                        pointHoverRadius: 10,
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderWidth: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    scales: {
-                        r: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: {
-                                stepSize: 20,
-                                color: '#94a3b8',
-                                backdropColor: 'transparent',
-                                font: { size: 12, weight: 'bold' }
-                            },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)',
-                                lineWidth: 2
-                            },
-                            angleLines: {
-                                color: 'rgba(255, 255, 255, 0.1)',
-                                lineWidth: 2
-                            },
-                            pointLabels: {
-                                color: '#f1f5f9',
-                                font: { size: 14, weight: 'bold' }
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                            titleColor: '#00d9ff',
-                            bodyColor: '#f1f5f9',
-                            borderColor: '#00d9ff',
-                            borderWidth: 2,
-                            padding: 12,
-                            displayColors: false
-                        }
-                    }
-                }
-            });
-        }
-
-        function updateHexagonChart() {
-            hexagonChart.data.datasets[0].data = Object.values(appData.hexagon);
-            hexagonChart.update();
-            
-            const total = Object.values(appData.hexagon).reduce((a, b) => a + b, 0);
-            document.getElementById('totalScore').textContent = total;
-            
-            const avgScore = total / 6;
-            let grade = 'E';
-            let gradeClass = 'grade-E';
-            
-            if (avgScore >= 90) { grade = 'S'; gradeClass = 'grade-S'; }
-            else if (avgScore >= 80) { grade = 'A'; gradeClass = 'grade-A'; }
-            else if (avgScore >= 70) { grade = 'B'; gradeClass = 'grade-B'; }
-            else if (avgScore >= 50) { grade = 'C'; gradeClass = 'grade-C'; }
-            else if (avgScore >= 30) { grade = 'D'; gradeClass = 'grade-D'; }
-            
-            const gradeEl = document.getElementById('gradeDisplay');
-            gradeEl.textContent = grade;
-            gradeEl.className = 'grade-letter ' + gradeClass;
-            
-            updateAllStats();
-        }
-
-        function updateAllStats() {
-            document.getElementById('statSTR').textContent = appData.hexagon.STR;
-            document.getElementById('statSPR').textContent = appData.hexagon.SPR;
-            document.getElementById('statINT').textContent = appData.hexagon.INT;
-            document.getElementById('statREC').textContent = appData.hexagon.REC;
-            document.getElementById('statJOY').textContent = appData.hexagon.JOY;
-            document.getElementById('statWIL').textContent = appData.hexagon.WIL;
-        }
-
-        function startTimer() {
-            if (timerRunning) return;
-            timerRunning = true;
-            timerInterval = setInterval(() => {
-                if (timerSeconds === 0) {
-                    if (timerMinutes === 0) {
-                        clearInterval(timerInterval);
-                        timerRunning = false;
-                        alert('⏰ Time is up! Great work! 🎉');
-                        return;
-                    }
-                    timerMinutes--;
-                    timerSeconds = 59;
-                } else {
-                    timerSeconds--;
-                }
-                updateTimerDisplay();
-            }, 1000);
-        }
-
-        function pauseTimer() {
-            clearInterval(timerInterval);
-            timerRunning = false;
-        }
-
-        function resetTimer() {
-            clearInterval(timerInterval);
-            timerRunning = false;
-            const mode = document.getElementById('timerMode').value;
-            timerMinutes = parseInt(mode);
-            timerSeconds = 0;
-            updateTimerDisplay();
-        }
-
-        function changeTimerMode() {
-            resetTimer();
-        }
-
-        function updateTimerDisplay() {
-            const mins = String(timerMinutes).padStart(2, '0');
-            const secs = String(timerSeconds).padStart(2, '0');
-            document.getElementById('timerDisplay').textContent = `${mins}:${secs}`;
-        }
-
-        function selectRating(grade, value) {
-            document.querySelectorAll('.rating-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            appData.selectedRating = grade;
-            appData.selectedRatingValue = value;
-        }
-
-        function openModal(type) {
-            closeModal();
-            appData.selectedRating = null;
-            appData.selectedRatingValue = 0;
-            document.querySelectorAll('.rating-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(type + 'Modal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
-        }
-
-        function toggleWillpower(element) {
-            element.classList.toggle('completed');
-        }
-
-        function updateSleepPreview() {
-            const time = document.getElementById('sleepTime').value;
-            if (!time) return;
-            
-            const [hours, minutes] = time.split(':').map(Number);
-            let score = 0;
-            
-            if (hours < 23) score = 100;
-            else if (hours === 23) score = 100 - Math.round(minutes * 0.33);
-            else if (hours === 0) score = 80 - Math.round(minutes * 0.33);
-            else if (hours === 1) score = 60 - Math.round(minutes * 0.5);
-            else if (hours === 2) score = 30 - Math.round(minutes * 0.5);
-            else if (hours >= 3 && hours < 12) score = 10;
-            else score = 100;
-            
-            score = Math.max(0, Math.min(100, score));
-            document.getElementById('sleepScorePreview').textContent = score;
-        }
-
-        function saveStudyLog() {
-            const subject = document.getElementById('studySubject').options[document.getElementById('studySubject').selectedIndex].text;
-            const topic = document.getElementById('studyTopic').value;
-            const duration = document.getElementById('studyDuration').value;
-            const location = document.getElementById('studyLocation').value;
-            const notes = document.getElementById('studyNotes').value;
-
-            if (!topic || !duration) {
-                alert('Please fill in required fields!');
-                return;
-            }
-
-            if (!appData.selectedRating) {
-                alert('Please rate your focus!');
-                return;
-            }
-
-            const bonus = appData.selectedRatingValue;
-            appData.hexagon.INT = Math.min(100, appData.hexagon.INT + bonus);
-
-            appData.logs.unshift({
-                type: 'study',
-                timestamp: new Date().toLocaleString('vi-VN'),
-                data: { subject, topic, duration, location, notes, rating: appData.selectedRating, score: bonus }
-            });
-
-            document.getElementById('studyTopic').value = '';
-            document.getElementById('studyDuration').value = '';
-            document.getElementById('studyLocation').value = '';
-            document.getElementById('studyNotes').value = '';
-
-            updateHexagonChart();
-            renderLogs();
-            saveData();
-            closeModal();
-            showNotification(`+${bonus} Brain! 📚`, 'brain');
-        }
-
-        function saveGymLog() {
-            const gymDay = document.getElementById('gymDay').options[document.getElementById('gymDay').selectedIndex].text;
-            const exercises = document.getElementById('gymExercises').value;
-            const duration = document.getElementById('gymDuration').value;
-
-            if (!exercises || !duration) {
-                alert('Please fill in all fields!');
-                return;
-            }
-
-            if (!appData.selectedRating) {
-                alert('Please rate intensity!');
-                return;
-            }
-
-            const bonus = appData.selectedRatingValue;
-            appData.hexagon.STR = Math.min(100, appData.hexagon.STR + bonus);
-
-            appData.logs.unshift({
-                type: 'gym',
-                timestamp: new Date().toLocaleString('vi-VN'),
-                data: { gymDay, exercises, duration, rating: appData.selectedRating, score: bonus }
-            });
-
-            document.getElementById('gymExercises').value = '';
-            document.getElementById('gymDuration').value = '';
-
-            updateHexagonChart();
-            renderLogs();
-            saveData();
-            closeModal();
-            showNotification(`+${bonus} Strength! 💪`, 'strength');
-        }
-
-        function saveSoulLog() {
-            const g1 = document.getElementById('gratitude1').value;
-            const g2 = document.getElementById('gratitude2').value;
-            const g3 = document.getElementById('gratitude3').value;
-            const meditation = document.getElementById('meditationNotes').value;
-
-            if (!g1 || !g2 || !g3) {
-                alert('Write 3 gratitude items!');
-                return;
-            }
-
-            const bonus = meditation ? 50 : 30;
-            appData.hexagon.SPR = Math.min(100, appData.hexagon.SPR + bonus);
-
-            appData.logs.unshift({
-                type: 'soul',
-                timestamp: new Date().toLocaleString('vi-VN'),
-                data: { gratitude: [g1, g2, g3], meditation }
-            });
-
-            document.getElementById('gratitude1').value = '';
-            document.getElementById('gratitude2').value = '';
-            document.getElementById('gratitude3').value = '';
-            document.getElementById('meditationNotes').value = '';
-
-            updateHexagonChart();
-            renderLogs();
-            saveData();
-            closeModal();
-            showNotification(`+${bonus} Spirit! 🙏`, 'spirit');
-        }
-
-        function saveJoyLog() {
-            const type = document.getElementById('joyType').options[document.getElementById('joyType').selectedIndex].text;
-            const title = document.getElementById('joyTitle').value;
-            const content = document.getElementById('joyContent').value;
-
-            if (!title || !content) {
-                alert('Fill all fields!');
-                return;
-            }
-
-            const bonus = 40;
-            appData.hexagon.JOY = Math.min(100, appData.hexagon.JOY + bonus);
-
-            appData.logs.unshift({
-                type: 'joy',
-                timestamp: new Date().toLocaleString('vi-VN'),
-                data: { type, title, content }
-            });
-
-            document.getElementById('joyTitle').value = '';
-            document.getElementById('joyContent').value = '';
-
-            updateHexagonChart();
-            renderLogs();
-            saveData();
-            closeModal();
-            showNotification(`+${bonus} Joy! ✨`, 'joy');
-        }
-
-        function saveWillpowerCheck() {
-            const checks = document.querySelectorAll('#willpowerModal .check-item.completed');
-            const count = checks.length;
-
-            if (count === 0) {
-                alert('Select at least 1!');
-                return;
-            }
-
-            const bonus = count * 25;
-            appData.hexagon.WIL = Math.min(100, appData.hexagon.WIL + bonus);
-
-            const items = Array.from(checks).map(c => c.querySelector('strong').textContent);
-
-            appData.logs.unshift({
-                type: 'willpower',
-                timestamp: new Date().toLocaleString('vi-VN'),
-                data: { count, items }
-            });
-
-            checks.forEach(c => c.classList.remove('completed'));
-
-            updateHexagonChart();
-            renderLogs();
-            saveData();
-            closeModal();
-            showNotification(`+${bonus} Willpower! 🛡️`, 'willpower');
-        }
-
-        function saveSleepLog() {
-            const time = document.getElementById('sleepTime').value;
-            if (!time) {
-                alert('Select sleep time!');
-                return;
-            }
-
-            const [hours, minutes] = time.split(':').map(Number);
-            let score = 0;
-            
-            if (hours < 23) score = 100;
-            else if (hours === 23) score = 100 - Math.round(minutes * 0.33);
-            else if (hours === 0) score = 80 - Math.round(minutes * 0.33);
-            else if (hours === 1) score = 60 - Math.round(minutes * 0.5);
-            else if (hours === 2) score = 30 - Math.round(minutes * 0.5);
-            else if (hours >= 3 && hours < 12) score = 10;
-            else score = 100;
-
-            score = Math.max(0, Math.min(100, score));
-            appData.hexagon.REC = score;
-
-            appData.logs.unshift({
-                type: 'sleep',
-                timestamp: new Date().toLocaleString('vi-VN'),
-                data: { time, score }
-            });
-
-            updateHexagonChart();
-            renderLogs();
-            saveData();
-            closeModal();
-            showNotification(`+${score} Recovery! 🌙`, 'recovery');
-        }
-
-        function renderLogs(filter = 'all') {
-            const container = document.getElementById('logsContainer');
-            let logs = appData.logs;
-
-            if (filter !== 'all') {
-                logs = logs.filter(l => l.type === filter);
-            }
-
-            if (logs.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 60px;">No logs yet! 🚀</div>';
-                return;
-            }
-
-            container.innerHTML = logs.slice(0, 30).map(log => {
-                let content = '';
-                let borderColor = 'var(--accent)';
-                
-                if (log.type === 'study') {
-                    borderColor = 'var(--brain)';
-                    content = `<strong>📚 ${log.data.subject} - ${log.data.topic}</strong><br>
-                        <div style="margin-top: 8px; color: var(--text-muted);">⏱️ ${log.data.duration}min • 📍 ${log.data.location} • 
-                        <span style="color: var(--brain); font-weight: 700;">Grade: ${log.data.rating}</span> (+${log.data.score})</div>
-                        ${log.data.notes ? `<div style="margin-top: 10px; font-style: italic;">"${log.data.notes}"</div>` : ''}`;
-                } else if (log.type === 'gym') {
-                    borderColor = 'var(--strength)';
-                    content = `<strong>💪 ${log.data.gymDay}</strong><br>
-                        <div style="margin-top: 8px; color: var(--text-muted);">⏱️ ${log.data.duration}min • 
-                        <span style="color: var(--strength); font-weight: 700;">Grade: ${log.data.rating}</span> (+${log.data.score})</div>
-                        <pre style="margin-top: 10px; color: var(--text-muted); white-space: pre-wrap; font-family: inherit;">${log.data.exercises}</pre>`;
-                } else if (log.type === 'soul') {
-                    borderColor = 'var(--spirit)';
-                    content = `<strong>🙏 Gratitude</strong><br>
-                        <ul style="margin-top: 10px; padding-left: 20px; line-height: 1.8;">${log.data.gratitude.map(i => `<li>${i}</li>`).join('')}</ul>
-                        ${log.data.meditation ? `<div style="margin-top: 10px; font-style: italic;">🧘 ${log.data.meditation}</div>` : ''}`;
-                } else if (log.type === 'joy') {
-                    borderColor = 'var(--joy)';
-                    content = `<strong>✨ ${log.data.type} - ${log.data.title}</strong><br>
-                        <div style="margin-top: 10px; line-height: 1.6;">${log.data.content}</div>`;
-                } else if (log.type === 'willpower') {
-                    borderColor = 'var(--willpower)';
-                    content = `<strong>🛡️ Willpower (${log.data.count}/4)</strong><br>
-                        <ul style="margin-top: 10px; padding-left: 20px; line-height: 1.8;">${log.data.items.map(i => `<li>${i}</li>`).join('')}</ul>`;
-                } else if (log.type === 'sleep') {
-                    borderColor = 'var(--recovery)';
-                    content = `<strong>🌙 Bedtime: ${log.data.time}</strong><br>
-                        <div style="margin-top: 8px;"><span style="color: var(--recovery); font-weight: 700;">Score: ${log.data.score}/100</span></div>`;
-                }
-
-                return `<div class="log-item" style="border-left-color: ${borderColor};">
-                    <div class="log-time">${log.timestamp}</div>${content}</div>`;
-            }).join('');
-        }
-
-        function switchLogTab(filter) {
-            document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            renderLogs(filter);
-        }
-
-        function showNotification(text, type = 'default') {
-            const notif = document.createElement('div');
-            notif.className = 'notification';
-            
-            let gradient = 'linear-gradient(135deg, var(--accent), var(--secondary))';
-            if (type === 'strength') gradient = 'linear-gradient(135deg, var(--strength), #dc2626)';
-            else if (type === 'brain') gradient = 'linear-gradient(135deg, var(--brain), #2563eb)';
-            else if (type === 'spirit') gradient = 'linear-gradient(135deg, var(--spirit), #059669)';
-            else if (type === 'joy') gradient = 'linear-gradient(135deg, var(--joy), #ea580c)';
-            else if (type === 'willpower') gradient = 'linear-gradient(135deg, var(--willpower), #db2777)';
-            else if (type === 'recovery') gradient = 'linear-gradient(135deg, var(--recovery), #7c3aed)';
-            
-            notif.style.background = gradient;
-            notif.style.color = '#fff';
-            notif.textContent = text;
-            document.body.appendChild(notif);
-
-            setTimeout(() => {
-                notif.style.animation = 'slideInRight 0.5s ease-in reverse';
-                setTimeout(() => notif.remove(), 500);
-            }, 3000);
-        }
-
-        init();
-        setInterval(saveData, 30000);
-
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', function(e) {
-                if (e.target === this) closeModal();
-            });
-        });
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeModal();
-        });
-    </script>
-</body>
-</html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Life OS - Personal Development System</title>
+    <title>Life OS - Hexagon System</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-    
     <style>
         :root {
             --bg-dark: #0a0e1a;
@@ -581,34 +23,25 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             --text-main: #f1f5f9;
             --text-muted: #94a3b8;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         @keyframes gradientShift {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
         @keyframes float {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-20px) rotate(5deg); }
         }
-
         @keyframes pulse {
             0%, 100% { opacity: 0.4; transform: scale(1); }
             50% { opacity: 0.8; transform: scale(1.05); }
         }
-
         @keyframes shimmer {
             0% { background-position: -1000px 0; }
             100% { background-position: 1000px 0; }
         }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
+        html { scroll-behavior: smooth; }
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(-45deg, #0a0e1a, #1a1f35, #0f1628, #1e2542);
@@ -619,7 +52,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             position: relative;
             min-height: 100vh;
         }
-
         body::before {
             content: '';
             position: fixed;
@@ -635,8 +67,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             pointer-events: none;
             z-index: 0;
         }
-
-        /* Particles */
         .particle {
             position: fixed;
             width: 4px;
@@ -647,8 +77,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             opacity: 0.5;
             z-index: 0;
         }
-
-        /* Hero Section */
         .hero {
             position: relative;
             min-height: 60vh;
@@ -660,7 +88,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             padding: 60px 20px;
             overflow: hidden;
         }
-
         .hero::before {
             content: '';
             position: absolute;
@@ -673,13 +100,11 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             animation: pulse 4s ease-in-out infinite;
             z-index: 0;
         }
-
         .hero-content {
             position: relative;
             z-index: 1;
             max-width: 1200px;
         }
-
         .hero-title {
             font-size: 5em;
             font-weight: 900;
@@ -691,21 +116,18 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             margin-bottom: 20px;
             line-height: 1.2;
         }
-
         .hero-subtitle {
             font-size: 1.5em;
             color: var(--text-muted);
             margin-bottom: 30px;
             font-weight: 300;
         }
-
         .hero-icon {
             font-size: 6em;
             margin-bottom: 30px;
             animation: float 3s ease-in-out infinite;
             filter: drop-shadow(0 0 30px var(--accent));
         }
-
         .scroll-indicator {
             position: absolute;
             bottom: 30px;
@@ -715,8 +137,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             color: var(--text-muted);
             font-size: 2em;
         }
-
-        /* Navigation Bar */
         .navbar {
             position: sticky;
             top: 0;
@@ -726,7 +146,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             border-bottom: 1px solid var(--glass-border);
             padding: 15px 0;
         }
-
         .navbar-content {
             max-width: 1600px;
             margin: 0 auto;
@@ -735,7 +154,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             justify-content: space-between;
             align-items: center;
         }
-
         .navbar-brand {
             font-size: 1.5em;
             font-weight: 800;
@@ -746,13 +164,11 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             align-items: center;
             gap: 12px;
         }
-
         .navbar-links {
             display: flex;
             gap: 30px;
             align-items: center;
         }
-
         .navbar-link {
             color: var(--text-muted);
             text-decoration: none;
@@ -760,7 +176,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             transition: all 0.3s;
             position: relative;
         }
-
         .navbar-link::after {
             content: '';
             position: absolute;
@@ -771,16 +186,12 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             background: var(--accent);
             transition: width 0.3s;
         }
-
         .navbar-link:hover {
             color: var(--text-main);
         }
-
         .navbar-link:hover::after {
             width: 100%;
         }
-
-        /* Main Container */
         .container {
             max-width: 1600px;
             margin: 0 auto;
@@ -788,13 +199,10 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             position: relative;
             z-index: 1;
         }
-
-        /* Section Headers */
         .section-header {
             text-align: center;
             margin-bottom: 50px;
         }
-
         .section-title {
             font-size: 2.5em;
             font-weight: 800;
@@ -803,13 +211,10 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             -webkit-text-fill-color: transparent;
             margin-bottom: 15px;
         }
-
         .section-subtitle {
             font-size: 1.1em;
             color: var(--text-muted);
         }
-
-        /* User Info Card */
         .user-info-card {
             display: flex;
             justify-content: space-between;
@@ -824,7 +229,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             position: relative;
             overflow: hidden;
         }
-
         .user-info-card::before {
             content: '';
             position: absolute;
@@ -835,22 +239,18 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
             animation: shimmer 3s infinite;
         }
-
         .user-info-left h2 {
             font-size: 1.8em;
             margin-bottom: 8px;
         }
-
         .user-info-right {
             text-align: right;
         }
-
         .current-date {
             font-size: 1.2em;
             font-weight: 700;
             text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
         }
-
         .streak-badge {
             display: inline-block;
             background: linear-gradient(135deg, var(--strength), var(--joy));
@@ -861,8 +261,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
             animation: pulse 2s ease-in-out infinite;
         }
-
-        /* Cards */
         .card {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
@@ -873,7 +271,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             overflow: hidden;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
-
         .card::before {
             content: '';
             position: absolute;
@@ -892,7 +289,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             opacity: 0.3;
             pointer-events: none;
         }
-
         .card-title {
             font-size: 1.2em;
             font-weight: 700;
@@ -901,7 +297,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             align-items: center;
             gap: 12px;
         }
-
         .card-title i {
             font-size: 1.3em;
             background: linear-gradient(135deg, var(--accent), var(--secondary));
@@ -909,20 +304,19 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             -webkit-text-fill-color: transparent;
             animation: float 2s ease-in-out infinite;
         }
-
-        /* Main Grid */
         .main-grid {
             display: grid;
             grid-template-columns: 1fr 1.5fr 1fr;
             gap: 25px;
             margin-bottom: 40px;
         }
-
         @media (max-width: 1200px) {
             .main-grid { grid-template-columns: 1fr; }
+            .hero-title { font-size: 3em; }
+            .navbar-links { display: none; }
+            .user-info-card { flex-direction: column; text-align: center; }
+            .user-info-right { margin-top: 20px; }
         }
-
-        /* Hexagon Chart */
         .hexagon-container {
             position: relative;
             height: 450px;
@@ -930,14 +324,12 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             align-items: center;
             justify-content: center;
         }
-
         .hexagon-canvas-wrapper {
             position: relative;
             width: 100%;
             height: 100%;
             filter: drop-shadow(0 0 30px rgba(0, 217, 255, 0.4));
         }
-
         .hexagon-score {
             text-align: center;
             margin-top: 20px;
@@ -948,9 +340,7 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             animation: gradientShift 5s ease infinite;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(0, 217, 255, 0.5);
         }
-
         .score-label {
             text-align: center;
             color: var(--text-muted);
@@ -959,38 +349,19 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             text-transform: uppercase;
             letter-spacing: 2px;
         }
-
-        /* Grade Display */
         .grade-display {
             text-align: center;
             margin-top: 15px;
             padding: 20px;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 15px;
-            border: 2px solid transparent;
-            background-clip: padding-box;
-            position: relative;
         }
-
-        .grade-display::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 15px;
-            padding: 2px;
-            background: linear-gradient(45deg, var(--accent), var(--secondary));
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-        }
-
         .grade-letter {
             font-size: 4em;
             font-weight: 900;
             line-height: 1;
             text-shadow: 0 0 30px currentColor;
         }
-
         .grade-E { color: #64748b; }
         .grade-D { color: #94a3b8; }
         .grade-C { color: #fbbf24; }
@@ -1002,14 +373,11 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             -webkit-text-fill-color: transparent;
             animation: pulse 1.5s ease-in-out infinite;
         }
-
-        /* Checklist */
         .checklist {
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
-
         .check-item {
             display: flex;
             align-items: center;
@@ -1019,38 +387,16 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s;
-            border-left: 3px solid transparent;
-            position: relative;
-            overflow: hidden;
         }
-
-        .check-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 3px;
-            height: 100%;
-            background: linear-gradient(180deg, var(--accent), var(--secondary));
-            transform: scaleY(0);
-            transition: transform 0.3s;
-        }
-
-        .check-item:hover::before {
-            transform: scaleY(1);
-        }
-
         .check-item:hover { 
             background: rgba(0, 0, 0, 0.5);
             transform: translateX(5px);
         }
-
         .check-item.completed {
             opacity: 0.6;
             text-decoration: line-through;
             background: rgba(16, 185, 129, 0.1);
         }
-
         .checkbox {
             min-width: 28px;
             height: 28px;
@@ -1062,29 +408,23 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             transition: all 0.3s;
             background: rgba(0, 0, 0, 0.3);
         }
-
         .check-item.completed .checkbox {
             background: linear-gradient(135deg, var(--accent), var(--secondary));
             border-color: var(--accent);
             box-shadow: 0 0 15px var(--accent);
         }
-
-        /* Pomodoro Timer */
         .pomodoro {
             text-align: center;
         }
-
         .timer-circle {
             width: 220px;
             height: 220px;
             margin: 20px auto;
-            position: relative;
             border-radius: 50%;
             background: conic-gradient(from 0deg, var(--accent) 0%, var(--secondary) 50%, var(--strength) 100%);
             padding: 8px;
             animation: float 4s ease-in-out infinite;
         }
-
         .timer-inner {
             width: 100%;
             height: 100%;
@@ -1095,16 +435,13 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             justify-content: center;
             box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
         }
-
         .timer-display {
             font-size: 3.2em;
             font-weight: 800;
-            font-variant-numeric: tabular-nums;
             background: linear-gradient(135deg, var(--accent), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         .timer-controls {
             display: flex;
             gap: 10px;
@@ -1112,7 +449,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             flex-wrap: wrap;
             margin-top: 20px;
         }
-
         .timer-btn {
             padding: 12px 24px;
             border: none;
@@ -1120,122 +456,51 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s;
-            font-size: 0.95em;
-            position: relative;
-            overflow: hidden;
         }
-
-        .timer-btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .timer-btn:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
         .timer-btn.start { background: linear-gradient(135deg, var(--accent), #00b8d4); color: #000; }
         .timer-btn.pause { background: linear-gradient(135deg, var(--willpower), #d946ef); color: #fff; }
         .timer-btn.reset { background: rgba(255, 255, 255, 0.1); color: var(--text-main); }
-
-        .timer-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0, 217, 255, 0.4); }
-
-        /* Action Buttons */
+        .timer-btn:hover { transform: translateY(-2px); }
         .action-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
         }
-
         .action-btn {
             padding: 18px;
             border: none;
             border-radius: 15px;
             cursor: pointer;
             font-weight: 700;
-            font-size: 0.95em;
             transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
             text-align: center;
             color: #fff;
         }
-
-        .action-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
-        }
-
-        .action-btn:hover::before {
-            left: 100%;
-        }
-
         .action-btn:hover { 
             transform: translateY(-3px) scale(1.02); 
-            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.5);
         }
-
         .btn-strength { background: linear-gradient(135deg, var(--strength), #dc2626); }
         .btn-brain { background: linear-gradient(135deg, var(--brain), #2563eb); }
         .btn-spirit { background: linear-gradient(135deg, var(--spirit), #059669); }
         .btn-joy { background: linear-gradient(135deg, var(--joy), #ea580c); }
         .btn-willpower { background: linear-gradient(135deg, var(--willpower), #db2777); }
         .btn-recovery { background: linear-gradient(135deg, var(--recovery), #7c3aed); }
-
-        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
         }
-
         .stat-box {
             background: rgba(0, 0, 0, 0.3);
             padding: 20px;
             border-radius: 15px;
             text-align: center;
             border-left: 4px solid;
-            position: relative;
-            overflow: hidden;
             transition: all 0.3s;
         }
-
-        .stat-box::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.05));
-            transform: translateX(-100%);
-            transition: transform 0.5s;
-        }
-
-        .stat-box:hover::before {
-            transform: translateX(0);
-        }
-
         .stat-box:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
-
         .stat-label {
             font-size: 0.85em;
             color: var(--text-muted);
@@ -1243,15 +508,11 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             letter-spacing: 1.5px;
             font-weight: 600;
         }
-
         .stat-value {
             font-size: 2.5em;
             font-weight: 900;
             margin-top: 8px;
-            text-shadow: 0 0 20px currentColor;
         }
-
-        /* Input Forms */
         input, textarea, select {
             width: 100%;
             padding: 14px 18px;
@@ -1261,18 +522,13 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             color: var(--text-main);
             border-radius: 12px;
             font-family: inherit;
-            font-size: 0.95em;
             transition: all 0.3s;
         }
-
         input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: var(--accent);
             box-shadow: 0 0 0 4px rgba(0, 217, 255, 0.2);
-            background: rgba(0, 0, 0, 0.6);
         }
-
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -1286,16 +542,8 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             align-items: center;
             justify-content: center;
             padding: 20px;
-            animation: fadeIn 0.3s;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
         .modal.active { display: flex; }
-
         .modal-content {
             background: var(--glass-bg);
             border: 2px solid var(--glass-border);
@@ -1305,30 +553,7 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
-            position: relative;
-            animation: slideUp 0.4s;
         }
-
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .modal-content::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 25px;
-            padding: 3px;
-            background: linear-gradient(45deg, var(--accent), var(--secondary), var(--strength));
-            background-size: 300% 300%;
-            animation: gradientShift 6s linear infinite;
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            opacity: 0.5;
-        }
-
         .modal h2 {
             margin-bottom: 25px;
             font-size: 1.8em;
@@ -1336,48 +561,36 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
         }
-
         .btn {
             padding: 16px;
             border: none;
             border-radius: 12px;
             cursor: pointer;
             font-weight: 700;
-            font-size: 1em;
             transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
         }
-
         .btn-primary {
             background: linear-gradient(135deg, var(--accent), #3b82f6);
             color: #000;
         }
-
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
             color: var(--text-main);
         }
-
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.4);
         }
-
-        /* Rating System */
         .rating-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 10px;
             margin: 20px 0;
         }
-
         .rating-btn {
             padding: 20px 10px;
             background: rgba(0, 0, 0, 0.3);
@@ -1388,103 +601,58 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             text-align: center;
             font-weight: 700;
         }
-
         .rating-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
             transform: scale(1.05);
         }
-
         .rating-btn.active {
             border-color: var(--accent);
             background: rgba(0, 217, 255, 0.2);
-            box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
         }
-
         .rating-E { border-color: #64748b !important; color: #64748b; }
         .rating-D { border-color: #94a3b8 !important; color: #94a3b8; }
         .rating-C { border-color: #fbbf24 !important; color: #fbbf24; }
         .rating-B { border-color: #3b82f6 !important; color: #3b82f6; }
         .rating-A { border-color: #10b981 !important; color: #10b981; }
-
-        /* Logs */
         .log-item {
             background: rgba(0, 0, 0, 0.3);
             padding: 20px;
             margin: 12px 0;
             border-left: 4px solid;
             border-radius: 12px;
-            font-size: 0.95em;
-            position: relative;
-            overflow: hidden;
-            animation: slideInLeft 0.4s;
         }
-
-        @keyframes slideInLeft {
-            from { transform: translateX(-50px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .log-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: linear-gradient(180deg, var(--accent), var(--secondary));
-        }
-
         .log-time {
             font-size: 0.8em;
             color: var(--text-muted);
             margin-bottom: 10px;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
-
-        /* Tabs */
         .tabs {
             display: flex;
             gap: 10px;
             margin-bottom: 25px;
             overflow-x: auto;
-            padding-bottom: 10px;
         }
-
         .tab {
             padding: 12px 24px;
             background: rgba(0, 0, 0, 0.3);
             border: 2px solid var(--glass-border);
             border-radius: 50px;
             cursor: pointer;
-            white-space: nowrap;
             transition: all 0.3s;
             font-weight: 600;
             color: var(--text-muted);
         }
-
-        .tab:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: var(--accent);
-        }
-
         .tab.active {
             background: linear-gradient(135deg, var(--accent), var(--secondary));
             color: #000;
-            border-color: var(--accent);
-            box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
         }
-
-        /* Footer */
         .footer {
             margin-top: 80px;
             padding: 40px 20px;
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             border-top: 1px solid var(--glass-border);
-            position: relative;
         }
-
         .footer-content {
             max-width: 1600px;
             margin: 0 auto;
@@ -1493,14 +661,12 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             gap: 40px;
             margin-bottom: 30px;
         }
-
         .footer-section h3 {
             margin-bottom: 20px;
             background: linear-gradient(135deg, var(--accent), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         .footer-section p, .footer-section a {
             color: var(--text-muted);
             line-height: 1.8;
@@ -1509,25 +675,20 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             margin-bottom: 10px;
             transition: all 0.3s;
         }
-
         .footer-section a:hover {
             color: var(--accent);
-            transform: translateX(5px);
         }
-
         .footer-bottom {
             text-align: center;
             padding-top: 30px;
             border-top: 1px solid var(--glass-border);
             color: var(--text-muted);
         }
-
         .social-links {
             display: flex;
             gap: 15px;
             margin-top: 15px;
         }
-
         .social-link {
             width: 40px;
             height: 40px;
@@ -1539,32 +700,10 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             transition: all 0.3s;
             color: var(--text-muted);
         }
-
         .social-link:hover {
             background: var(--accent);
             color: #000;
-            transform: translateY(-3px);
         }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.3);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, var(--accent), var(--secondary));
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, var(--secondary), var(--strength));
-        }
-
-        /* Notification */
         .notification {
             position: fixed;
             top: 20px;
@@ -1572,55 +711,37 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             padding: 20px 30px;
             border-radius: 15px;
             font-weight: 700;
-            font-size: 1.1em;
             z-index: 9999;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            animation: slideInRight 0.5s ease-out;
+            color: #fff;
         }
-
-        @keyframes slideInRight {
-            from { transform: translateX(400px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        ::-webkit-scrollbar {
+            width: 10px;
         }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero-title { font-size: 3em; }
-            .hero-subtitle { font-size: 1.2em; }
-            .navbar-links { display: none; }
-            .user-info-card { flex-direction: column; text-align: center; }
-            .user-info-right { margin-top: 20px; }
-            .action-grid { grid-template-columns: 1fr; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--accent), var(--secondary));
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
-    <!-- Hero Section -->
     <div class="hero">
         <div class="hero-content">
-            <div class="hero-icon">
-                <i class="fa-solid fa-hexagon"></i>
-            </div>
+            <div class="hero-icon"><i class="fa-solid fa-hexagon"></i></div>
             <h1 class="hero-title">Life OS</h1>
             <p class="hero-subtitle">Transform Your Life with Hexagon System</p>
             <p style="color: var(--text-muted); max-width: 800px; margin: 0 auto; line-height: 1.8;">
-                Track your strength, spirit, brain power, recovery, joy, and willpower. 
-                Build the ultimate version of yourself, one day at a time.
+                Track your strength, spirit, brain power, recovery, joy, and willpower. Build the ultimate version of yourself, one day at a time.
             </p>
         </div>
-        <div class="scroll-indicator">
-            <i class="fa-solid fa-chevron-down"></i>
-        </div>
+        <div class="scroll-indicator"><i class="fa-solid fa-chevron-down"></i></div>
     </div>
 
-    <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="navbar-content">
-            <div class="navbar-brand">
-                <i class="fa-solid fa-hexagon"></i>
-                Life OS
-            </div>
+            <div class="navbar-brand"><i class="fa-solid fa-hexagon"></i> Life OS</div>
             <div class="navbar-links">
                 <a href="#dashboard" class="navbar-link">Dashboard</a>
                 <a href="#tracker" class="navbar-link">Tracker</a>
@@ -1630,15 +751,12 @@ particle.style.animationDelay = Math.random() * 5 + 's';
         </div>
     </nav>
 
-    <!-- Main Content -->
     <div class="container" id="dashboard">
-        <!-- Section Header -->
         <div class="section-header">
             <h2 class="section-title">Your Dashboard</h2>
             <p class="section-subtitle">Monitor your daily progress and hexagon stats</p>
         </div>
 
-        <!-- User Info Card -->
         <div class="user-info-card">
             <div class="user-info-left">
                 <h2>Welcome Back!</h2>
@@ -1646,45 +764,29 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             </div>
             <div class="user-info-right">
                 <div class="current-date" id="currentDate"></div>
-                <div class="streak-badge">
-                    🔥 <span id="dayStreak">0</span> Day Streak
-                </div>
+                <div class="streak-badge">🔥 <span id="dayStreak">0</span> Day Streak</div>
             </div>
         </div>
 
-        <!-- Main Grid -->
         <div class="main-grid" id="tracker">
-            <!-- Left Column -->
             <div>
-                <!-- Daily Routine -->
                 <div class="card">
-                    <div class="card-title">
-                        <i class="fa-solid fa-list-check"></i>
-                        Daily Routine
-                    </div>
+                    <div class="card-title"><i class="fa-solid fa-list-check"></i> Daily Routine</div>
                     <div class="checklist" id="routineList"></div>
-                    <div style="margin-top: 20px; text-align: center; font-size: 1em; color: var(--text-muted);">
+                    <div style="margin-top: 20px; text-align: center;">
                         Progress: <span id="routineProgress" style="color: var(--accent); font-weight: 700; font-size: 1.2em;">0%</span>
                     </div>
                 </div>
 
-                <!-- Kohi Checklist -->
                 <div class="card" style="margin-top: 20px;">
-                    <div class="card-title">
-                        <i class="fa-solid fa-language"></i>
-                        Kohi Daily
-                    </div>
+                    <div class="card-title"><i class="fa-solid fa-language"></i> Kohi Daily</div>
                     <div class="checklist" id="kohiList"></div>
                 </div>
             </div>
 
-            <!-- Center Column - Hexagon -->
             <div>
                 <div class="card">
-                    <div class="card-title" style="justify-content: center;">
-                        <i class="fa-solid fa-chart-radar"></i>
-                        Hexagon Status
-                    </div>
+                    <div class="card-title" style="justify-content: center;"><i class="fa-solid fa-chart-radar"></i> Hexagon Status</div>
                     <div class="hexagon-container">
                         <div class="hexagon-canvas-wrapper">
                             <canvas id="hexagonChart"></canvas>
@@ -1693,14 +795,12 @@ particle.style.animationDelay = Math.random() * 5 + 's';
                     <div class="hexagon-score" id="totalScore">0</div>
                     <div class="score-label">Total Power</div>
                     
-                    <!-- Grade Display -->
                     <div class="grade-display">
                         <div style="font-size: 0.9em; color: var(--text-muted); margin-bottom: 8px;">Today's Grade</div>
                         <div class="grade-letter" id="gradeDisplay">E</div>
                     </div>
                 </div>
 
-                <!-- Stats -->
                 <div class="stats-grid" id="stats" style="margin-top: 20px;">
                     <div class="stat-box" style="border-left-color: var(--strength);">
                         <div class="stat-label">Strength</div>
@@ -1729,14 +829,9 @@ particle.style.animationDelay = Math.random() * 5 + 's';
                 </div>
             </div>
 
-            <!-- Right Column -->
             <div>
-                <!-- Pomodoro -->
                 <div class="card pomodoro">
-                    <div class="card-title">
-                        <i class="fa-solid fa-clock"></i>
-                        Focus Timer
-                    </div>
+                    <div class="card-title"><i class="fa-solid fa-clock"></i> Focus Timer</div>
                     <div class="timer-circle">
                         <div class="timer-inner">
                             <div class="timer-display" id="timerDisplay">25:00</div>
@@ -1759,12 +854,8 @@ particle.style.animationDelay = Math.random() * 5 + 's';
                     </select>
                 </div>
 
-                <!-- Quick Actions -->
                 <div class="card" style="margin-top: 20px;">
-                    <div class="card-title">
-                        <i class="fa-solid fa-bolt"></i>
-                        Quick Actions
-                    </div>
+                    <div class="card-title"><i class="fa-solid fa-bolt"></i> Quick Actions</div>
                     <div class="action-grid">
                         <button class="action-btn btn-strength" onclick="openModal('gym')">
                             <i class="fa-solid fa-dumbbell"></i><br>Gym
@@ -1789,12 +880,8 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             </div>
         </div>
 
-        <!-- Logs Section -->
         <div class="card" id="logs">
-            <div class="card-title">
-                <i class="fa-solid fa-clock-rotate-left"></i>
-                Activity Logs
-            </div>
+            <div class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> Activity Logs</div>
             <div class="tabs">
                 <button class="tab active" onclick="switchLogTab('all')">All</button>
                 <button class="tab" onclick="switchLogTab('study')">Study</button>
@@ -1806,12 +893,11 @@ particle.style.animationDelay = Math.random() * 5 + 's';
         </div>
     </div>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
                 <h3><i class="fa-solid fa-hexagon"></i> Life OS</h3>
-                <p>A personal development tracking system designed to help you build the ultimate version of yourself through the Hexagon System methodology.</p>
+                <p>Personal development system for building your best self.</p>
                 <div class="social-links">
                     <a href="#" class="social-link"><i class="fa-brands fa-github"></i></a>
                     <a href="#" class="social-link"><i class="fa-brands fa-twitter"></i></a>
@@ -1823,28 +909,26 @@ particle.style.animationDelay = Math.random() * 5 + 's';
                 <a href="#dashboard">Dashboard</a>
                 <a href="#tracker">Tracker</a>
                 <a href="#stats">Statistics</a>
-                <a href="#logs">Activity Logs</a>
+                <a href="#logs">Logs</a>
             </div>
             <div class="footer-section">
                 <h3>Resources</h3>
                 <a href="#">User Guide</a>
                 <a href="#">Best Practices</a>
-                <a href="#">Community Forum</a>
                 <a href="#">Support</a>
             </div>
             <div class="footer-section">
                 <h3>About</h3>
                 <p>Version 2.0</p>
-                <p>Built with passion for self-improvement</p>
-                <p>© 2025 Life OS. All rights reserved.</p>
+                <p>© 2025 Life OS</p>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>Made with <i class="fa-solid fa-heart" style="color: var(--strength);"></i> for personal growth enthusiasts</p>
+            <p>Made with <i class="fa-solid fa-heart" style="color: var(--strength);"></i> for self-improvement</p>
         </div>
     </footer>
 
-    <!-- Modals (same as before) -->
+    <!-- Modals -->
     <div class="modal" id="studyModal">
         <div class="modal-content">
             <h2><i class="fa-solid fa-graduation-cap"></i> Study Session</h2>
@@ -1856,13 +940,12 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             </select>
             <input type="text" id="studyTopic" placeholder="What did you study?">
             <div class="grid-2">
-                <input type="number" id="studyDuration" placeholder="Duration (minutes)">
+                <input type="number" id="studyDuration" placeholder="Duration (min)">
                 <input type="text" id="studyLocation" placeholder="Location">
             </div>
-            
             <div style="margin: 20px 0;">
                 <div style="font-size: 0.9em; color: var(--text-muted); margin-bottom: 12px; text-align: center;">
-                    📊 Rate Your Focus Quality
+                    📊 Rate Your Focus
                 </div>
                 <div class="rating-grid">
                     <div class="rating-btn rating-E" onclick="selectRating('E', 20)">E<br><small>Poor</small></div>
@@ -1872,7 +955,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
                     <div class="rating-btn rating-A" onclick="selectRating('A', 90)">A<br><small>Perfect</small></div>
                 </div>
             </div>
-            
             <textarea id="studyNotes" rows="3" placeholder="Key takeaways..."></textarea>
             <div class="grid-2">
                 <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
@@ -1890,12 +972,11 @@ particle.style.animationDelay = Math.random() * 5 + 's';
                 <option value="legs">🦵 Leg Day</option>
                 <option value="cardio">🏃 Cardio</option>
             </select>
-            <textarea id="gymExercises" rows="5" placeholder="Exercises:&#10;Bench Press 60kg x 8&#10;Squat 80kg x 5"></textarea>
-            <input type="number" id="gymDuration" placeholder="Duration (minutes)">
-            
+            <textarea id="gymExercises" rows="5" placeholder="Exercises:&#10;Bench 60kg x8&#10;Squat 80kg x5"></textarea>
+            <input type="number" id="gymDuration" placeholder="Duration (min)">
             <div style="margin: 20px 0;">
                 <div style="font-size: 0.9em; color: var(--text-muted); margin-bottom: 12px; text-align: center;">
-                    💪 Rate Workout Intensity
+                    💪 Rate Intensity
                 </div>
                 <div class="rating-grid">
                     <div class="rating-btn rating-E" onclick="selectRating('E', 20)">E<br><small>Light</small></div>
@@ -1905,7 +986,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
                     <div class="rating-btn rating-A" onclick="selectRating('A', 90)">A<br><small>Beast</small></div>
                 </div>
             </div>
-            
             <div class="grid-2">
                 <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="saveGymLog()">Save (+Strength)</button>
@@ -1916,7 +996,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
     <div class="modal" id="soulModal">
         <div class="modal-content">
             <h2><i class="fa-solid fa-spa"></i> Soul Nourishment</h2>
-            
             <div style="margin: 20px 0;">
                 <div style="font-size: 0.9em; color: var(--text-muted); margin-bottom: 15px;">
                     🙏 Three things I'm grateful for:
@@ -1925,9 +1004,7 @@ particle.style.animationDelay = Math.random() * 5 + 's';
                 <input type="text" id="gratitude2" placeholder="2. I'm grateful for..." style="background: rgba(16, 185, 129, 0.1); border-color: var(--spirit);">
                 <input type="text" id="gratitude3" placeholder="3. I'm grateful for..." style="background: rgba(16, 185, 129, 0.1); border-color: var(--spirit);">
             </div>
-            
             <textarea id="meditationNotes" rows="4" placeholder="🧘 Meditation reflection..."></textarea>
-            
             <div class="grid-2">
                 <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="saveSoulLog()">Save (+Spirit)</button>
@@ -1938,17 +1015,14 @@ particle.style.animationDelay = Math.random() * 5 + 's';
     <div class="modal" id="joyModal">
         <div class="modal-content">
             <h2><i class="fa-solid fa-lightbulb"></i> Creative Output</h2>
-            
             <select id="joyType">
-                <option value="idea">💡 Blog Post Idea</option>
+                <option value="idea">💡 Blog Idea</option>
                 <option value="reading">📚 Reading Notes</option>
                 <option value="video">🎥 Video Notes</option>
                 <option value="creation">🎨 Creative Work</option>
             </select>
-            
-            <input type="text" id="joyTitle" placeholder="Title or topic...">
-            <textarea id="joyContent" rows="6" placeholder="Your thoughts and insights..."></textarea>
-            
+            <input type="text" id="joyTitle" placeholder="Title...">
+            <textarea id="joyContent" rows="6" placeholder="Your thoughts..."></textarea>
             <div class="grid-2">
                 <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="saveJoyLog()">Save (+Joy)</button>
@@ -1960,20 +1034,18 @@ particle.style.animationDelay = Math.random() * 5 + 's';
         <div class="modal-content">
             <h2><i class="fa-solid fa-shield-halved"></i> Willpower Check</h2>
             <p style="color: var(--text-muted); margin-bottom: 25px; text-align: center;">
-                Did you resist these temptations today?
+                Did you resist these temptations?
             </p>
-            
             <div style="display: flex; flex-direction: column; gap: 15px;">
                 <div class="check-item" onclick="toggleWillpower(this)" style="background: rgba(236, 72, 153, 0.1); border-left-color: var(--willpower);">
                     <div class="checkbox"></div>
                     <div>
                         <strong>📱 No mindless scrolling</strong>
                         <div style="font-size: 0.85em; color: var(--text-muted); margin-top: 5px;">
-                            Limited social media < 15 min
+                            Social media < 15min
                         </div>
                     </div>
                 </div>
-
                 <div class="check-item" onclick="toggleWillpower(this)" style="background: rgba(236, 72, 153, 0.1); border-left-color: var(--willpower);">
                     <div class="checkbox"></div>
                     <div>
@@ -1983,7 +1055,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
                         </div>
                     </div>
                 </div>
-
                 <div class="check-item" onclick="toggleWillpower(this)" style="background: rgba(236, 72, 153, 0.1); border-left-color: var(--willpower);">
                     <div class="checkbox"></div>
                     <div>
@@ -1993,7 +1064,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
                         </div>
                     </div>
                 </div>
-
                 <div class="check-item" onclick="toggleWillpower(this)" style="background: rgba(236, 72, 153, 0.1); border-left-color: var(--willpower);">
                     <div class="checkbox"></div>
                     <div>
@@ -2004,7 +1074,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
                     </div>
                 </div>
             </div>
-
             <div class="grid-2" style="margin-top: 25px;">
                 <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="saveWillpowerCheck()">Save (+Willpower)</button>
@@ -2018,16 +1087,11 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             <p style="color: var(--text-muted); margin-bottom: 20px; text-align: center;">
                 What time did you go to bed?
             </p>
-            
             <input type="time" id="sleepTime" value="23:00" style="font-size: 1.5em; text-align: center; padding: 20px;">
-            
             <div style="margin: 25px 0; padding: 25px; background: rgba(139, 92, 246, 0.1); border-radius: 15px; border: 2px solid var(--recovery);">
-                <div style="font-size: 0.9em; color: var(--text-muted); text-align: center;">
-                    💤 Recovery Score Preview
-                </div>
+                <div style="font-size: 0.9em; color: var(--text-muted); text-align: center;">💤 Recovery Score</div>
                 <div style="font-size: 3em; font-weight: 800; color: var(--recovery); margin-top: 10px; text-align: center;" id="sleepScorePreview">100</div>
             </div>
-            
             <div style="font-size: 0.85em; color: var(--text-muted); line-height: 1.8; background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 10px;">
                 <strong>Scoring:</strong><br>
                 ✨ Before 11pm: 100<br>
@@ -2036,7 +1100,6 @@ particle.style.animationDelay = Math.random() * 5 + 's';
                 😴 1am-2am: 30<br>
                 💀 After 2am: 10
             </div>
-            
             <div class="grid-2" style="margin-top: 20px;">
                 <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="saveSleepLog()">Save (+Recovery)</button>
@@ -2051,7 +1114,7 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             routine: [
                 { id: 'bed', text: '🛏️ Make your bed', done: false },
                 { id: 'water', text: '💧 Drink 2L water', done: false },
-                { id: 'skincare', text: '✨ Skincare routine', done: false },
+                { id: 'skincare', text: '✨ Skincare', done: false },
                 { id: 'shower', text: '🚿 Morning shower', done: false }
             ],
             kohi: [
@@ -2066,11 +1129,8 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             selectedRatingValue: 0
         };
 
-        let hexagonChart;
-        let timerInterval;
-        let timerMinutes = 25;
-        let timerSeconds = 0;
-        let timerRunning = false;
+        let hexagonChart, timerInterval;
+        let timerMinutes = 25, timerSeconds = 0, timerRunning = false;
 
         function init() {
             loadData();
@@ -2081,16 +1141,465 @@ particle.style.animationDelay = Math.random() * 5 + 's';
             updateAllStats();
             renderLogs();
             createParticles();
-            
             document.getElementById('sleepTime').addEventListener('input', updateSleepPreview);
             updateSleepPreview();
         }
 
         function createParticles() {
             for (let i = 0; i < 30; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.animation = `float ${Math.random() * 10 + 5}s ease-in-out infinite`;
-                particle
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.top = Math.random() * 100 + '%';
+                p.style.animation = `float ${Math.random() * 10 + 5}s ease-in-out infinite`;
+                p.style.animationDelay = Math.random() * 5 + 's';
+                document.body.appendChild(p);
+            }
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('hexagonOS');
+            if (saved) {
+                const data = JSON.parse(saved);
+                if (data.today !== new Date().toDateString()) {
+                    const daysDiff = Math.floor((new Date() - new Date(data.lastActive)) / (1000 * 60 * 60 * 24));
+                    appData.streak = daysDiff === 1 ? data.streak + 1 : 1;
+                    appData.routine.forEach(r => r.done = false);
+                    appData.kohi.forEach(k => k.done = false);
+                    appData.hexagon = { STR: 0, SPR: 0, INT: 0, REC: 0, JOY: 0, WIL: 0 };
+                    appData.logs = data.logs || [];
+                } else {
+                    appData = { ...appData, ...data };
+                }
+            }
+        }
+
+        function saveData() {
+            appData.today = new Date().toDateString();
+            localStorage.setItem('hexagonOS', JSON.stringify(appData));
+        }
+
+        function updateDate() {
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('dayStreak').textContent = appData.streak;
+        }
+
+        function renderRoutine() {
+            document.getElementById('routineList').innerHTML = appData.routine.map(item => `
+                <div class="check-item ${item.done ? 'completed' : ''}" onclick="toggleRoutine('${item.id}')">
+                    <div class="checkbox">${item.done ? '<i class="fa-solid fa-check"></i>' : ''}</div>
+                    <span>${item.text}</span>
+                </div>
+            `).join('');
+            document.getElementById('routineProgress').textContent = Math.round((appData.routine.filter(r => r.done).length / appData.routine.length) * 100) + '%';
+        }
+
+        function toggleRoutine(id) {
+            appData.routine.find(r => r.id === id).done = !appData.routine.find(r => r.id === id).done;
+            renderRoutine();
+            saveData();
+        }
+
+        function renderKohi() {
+            document.getElementById('kohiList').innerHTML = appData.kohi.map(item => `
+                <div class="check-item ${item.done ? 'completed' : ''}" onclick="toggleKohi('${item.id}')">
+                    <div class="checkbox">${item.done ? '<i class="fa-solid fa-check"></i>' : ''}</div>
+                    <span>${item.text}</span>
+                </div>
+            `).join('');
+        }
+
+        function toggleKohi(id) {
+            appData.kohi.find(k => k.id === id).done = !appData.kohi.find(k => k.id === id).done;
+            appData.hexagon.INT = Math.max(appData.hexagon.INT, appData.kohi.filter(k => k.done).length * 15);
+            renderKohi();
+            updateHexagonChart();
+            saveData();
+        }
+
+        function initHexagonChart() {
+            hexagonChart = new Chart(document.getElementById('hexagonChart'), {
+                type: 'radar',
+                data: {
+                    labels: ['Strength', 'Spirit', 'Brain', 'Recovery', 'Joy', 'Willpower'],
+                    datasets: [{
+                        data: Object.values(appData.hexagon),
+                        backgroundColor: 'rgba(0, 217, 255, 0.3)',
+                        borderColor: '#00d9ff',
+                        borderWidth: 4,
+                        pointBackgroundColor: ['#ef4444', '#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ec4899'],
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 3,
+                        pointRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { stepSize: 20, color: '#94a3b8', backdropColor: 'transparent' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: { color: '#f1f5f9', font: { size: 14, weight: 'bold' } }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function updateHexagonChart() {
+            hexagonChart.data.datasets[0].data = Object.values(appData.hexagon);
+            hexagonChart.update();
+            const total = Object.values(appData.hexagon).reduce((a, b) => a + b, 0);
+            document.getElementById('totalScore').textContent = total;
+            const avg = total / 6;
+            let grade = 'E', gradeClass = 'grade-E';
+            if (avg >= 90) { grade = 'S'; gradeClass = 'grade-S'; }
+            else if (avg >= 80) { grade = 'A'; gradeClass = 'grade-A'; }
+            else if (avg >= 70) { grade = 'B'; gradeClass = 'grade-B'; }
+            else if (avg >= 50) { grade = 'C'; gradeClass = 'grade-C'; }
+            else if (avg >= 30) { grade = 'D'; gradeClass = 'grade-D'; }
+            const gradeEl = document.getElementById('gradeDisplay');
+            gradeEl.textContent = grade;
+            gradeEl.className = 'grade-letter ' + gradeClass;
+            updateAllStats();
+        }
+
+        function updateAllStats() {
+            document.getElementById('statSTR').textContent = appData.hexagon.STR;
+            document.getElementById('statSPR').textContent = appData.hexagon.SPR;
+            document.getElementById('statINT').textContent = appData.hexagon.INT;
+            document.getElementById('statREC').textContent = appData.hexagon.REC;
+            document.getElementById('statJOY').textContent = appData.hexagon.JOY;
+            document.getElementById('statWIL').textContent = appData.hexagon.WIL;
+        }
+
+        function startTimer() {
+            if (timerRunning) return;
+            timerRunning = true;
+            timerInterval = setInterval(() => {
+                if (timerSeconds === 0) {
+                    if (timerMinutes === 0) {
+                        clearInterval(timerInterval);
+                        timerRunning = false;
+                        alert('⏰ Time up! 🎉');
+                        return;
+                    }
+                    timerMinutes--;
+                    timerSeconds = 59;
+                } else {
+                    timerSeconds--;
+                }
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            timerRunning = false;
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timerRunning = false;
+            timerMinutes = parseInt(document.getElementById('timerMode').value);
+            timerSeconds = 0;
+            updateTimerDisplay();
+        }
+
+        function changeTimerMode() {
+            resetTimer();
+        }
+
+        function updateTimerDisplay() {
+            document.getElementById('timerDisplay').textContent = `${String(timerMinutes).padStart(2, '0')}:${String(timerSeconds).padStart(2, '0')}`;
+        }
+
+        function selectRating(grade, value) {
+            document.querySelectorAll('.rating-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            appData.selectedRating = grade;
+            appData.selectedRatingValue = value;
+        }
+
+        function openModal(type) {
+            closeModal();
+            appData.selectedRating = null;
+            appData.selectedRatingValue = 0;
+            document.querySelectorAll('.rating-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(type + 'Modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+        }
+
+        function toggleWillpower(element) {
+            element.classList.toggle('completed');
+        }
+
+        function updateSleepPreview() {
+            const time = document.getElementById('sleepTime').value;
+            if (!time) return;
+            const [hours, minutes] = time.split(':').map(Number);
+            let score = 0;
+            if (hours < 23) score = 100;
+            else if (hours === 23) score = 100 - Math.round(minutes * 0.33);
+            else if (hours === 0) score = 80 - Math.round(minutes * 0.33);
+            else if (hours === 1) score = 60 - Math.round(minutes * 0.5);
+            else if (hours === 2) score = 30 - Math.round(minutes * 0.5);
+            else if (hours >= 3 && hours < 12) score = 10;
+            else score = 100;
+            document.getElementById('sleepScorePreview').textContent = Math.max(0, Math.min(100, score));
+            }
+      function saveStudyLog() {
+        const subject = document.getElementById('studySubject').options[document.getElementById('studySubject').selectedIndex].text;
+        const topic = document.getElementById('studyTopic').value;
+        const duration = document.getElementById('studyDuration').value;
+        const location = document.getElementById('studyLocation').value;
+        const notes = document.getElementById('studyNotes').value;
+
+        if (!topic || !duration || !appData.selectedRating) {
+            alert('Please fill all fields and rate!');
+            return;
+        }
+
+        appData.hexagon.INT = Math.min(100, appData.hexagon.INT + appData.selectedRatingValue);
+        appData.logs.unshift({
+            type: 'study',
+            timestamp: new Date().toLocaleString('vi-VN'),
+            data: { subject, topic, duration, location, notes, rating: appData.selectedRating, score: appData.selectedRatingValue }
+        });
+
+        document.getElementById('studyTopic').value = '';
+        document.getElementById('studyDuration').value = '';
+        document.getElementById('studyLocation').value = '';
+        document.getElementById('studyNotes').value = '';
+
+        updateHexagonChart();
+        renderLogs();
+        saveData();
+        closeModal();
+        showNotification(`+${appData.selectedRatingValue} Brain! 📚`, 'linear-gradient(135deg, var(--brain), #2563eb)');
+    }
+
+    function saveGymLog() {
+        const gymDay = document.getElementById('gymDay').options[document.getElementById('gymDay').selectedIndex].text;
+        const exercises = document.getElementById('gymExercises').value;
+        const duration = document.getElementById('gymDuration').value;
+
+        if (!exercises || !duration || !appData.selectedRating) {
+            alert('Please fill all fields and rate!');
+            return;
+        }
+
+        appData.hexagon.STR = Math.min(100, appData.hexagon.STR + appData.selectedRatingValue);
+        appData.logs.unshift({
+            type: 'gym',
+            timestamp: new Date().toLocaleString('vi-VN'),
+            data: { gymDay, exercises, duration, rating: appData.selectedRating, score: appData.selectedRatingValue }
+        });
+
+        document.getElementById('gymExercises').value = '';
+        document.getElementById('gymDuration').value = '';
+
+        updateHexagonChart();
+        renderLogs();
+        saveData();
+        closeModal();
+        showNotification(`+${appData.selectedRatingValue} Strength! 💪`, 'linear-gradient(135deg, var(--strength), #dc2626)');
+    }
+
+    function saveSoulLog() {
+        const g1 = document.getElementById('gratitude1').value;
+        const g2 = document.getElementById('gratitude2').value;
+        const g3 = document.getElementById('gratitude3').value;
+        const meditation = document.getElementById('meditationNotes').value;
+
+        if (!g1 || !g2 || !g3) {
+            alert('Write 3 gratitude items!');
+            return;
+        }
+
+        const bonus = meditation ? 50 : 30;
+        appData.hexagon.SPR = Math.min(100, appData.hexagon.SPR + bonus);
+        appData.logs.unshift({
+            type: 'soul',
+            timestamp: new Date().toLocaleString('vi-VN'),
+            data: { gratitude: [g1, g2, g3], meditation }
+        });
+
+        document.getElementById('gratitude1').value = '';
+        document.getElementById('gratitude2').value = '';
+        document.getElementById('gratitude3').value = '';
+        document.getElementById('meditationNotes').value = '';
+
+        updateHexagonChart();
+        renderLogs();
+        saveData();
+        closeModal();
+        showNotification(`+${bonus} Spirit! 🙏`, 'linear-gradient(135deg, var(--spirit), #059669)');
+    }
+
+    function saveJoyLog() {
+        const type = document.getElementById('joyType').options[document.getElementById('joyType').selectedIndex].text;
+        const title = document.getElementById('joyTitle').value;
+        const content = document.getElementById('joyContent').value;
+
+        if (!title || !content) {
+            alert('Fill all fields!');
+            return;
+        }
+
+        appData.hexagon.JOY = Math.min(100, appData.hexagon.JOY + 40);
+        appData.logs.unshift({
+            type: 'joy',
+            timestamp: new Date().toLocaleString('vi-VN'),
+            data: { type, title, content }
+        });
+
+        document.getElementById('joyTitle').value = '';
+        document.getElementById('joyContent').value = '';
+
+        updateHexagonChart();
+        renderLogs();
+        saveData();
+        closeModal();
+        showNotification('+40 Joy! ✨', 'linear-gradient(135deg, var(--joy), #ea580c)');
+    }
+
+    function saveWillpowerCheck() {
+        const checks = document.querySelectorAll('#willpowerModal .check-item.completed');
+        if (checks.length === 0) {
+            alert('Select at least 1!');
+            return;
+        }
+
+        const bonus = checks.length * 25;
+        appData.hexagon.WIL = Math.min(100, appData.hexagon.WIL + bonus);
+        const items = Array.from(checks).map(c => c.querySelector('strong').textContent);
+
+        appData.logs.unshift({
+            type: 'willpower',
+            timestamp: new Date().toLocaleString('vi-VN'),
+            data: { count: checks.length, items }
+        });
+
+        checks.forEach(c => c.classList.remove('completed'));
+
+        updateHexagonChart();
+        renderLogs();
+        saveData();
+        closeModal();
+        showNotification(`+${bonus} Willpower! 🛡️`, 'linear-gradient(135deg, var(--willpower), #db2777)');
+    }
+
+    function saveSleepLog() {
+        const time = document.getElementById('sleepTime').value;
+        if (!time) {
+            alert('Select sleep time!');
+            return;
+        }
+
+        const [hours, minutes] = time.split(':').map(Number);
+        let score = 0;
+        if (hours < 23) score = 100;
+        else if (hours === 23) score = 100 - Math.round(minutes * 0.33);
+        else if (hours === 0) score = 80 - Math.round(minutes * 0.33);
+        else if (hours === 1) score = 60 - Math.round(minutes * 0.5);
+        else if (hours === 2) score = 30 - Math.round(minutes * 0.5);
+        else if (hours >= 3 && hours < 12) score = 10;
+        else score = 100;
+
+        score = Math.max(0, Math.min(100, score));
+        appData.hexagon.REC = score;
+
+        appData.logs.unshift({
+            type: 'sleep',
+            timestamp: new Date().toLocaleString('vi-VN'),
+            data: { time, score }
+        });
+
+        updateHexagonChart();
+        renderLogs();
+        saveData();
+        closeModal();
+        showNotification(`+${score} Recovery! 🌙`, 'linear-gradient(135deg, var(--recovery), #7c3aed)');
+    }
+
+    function renderLogs(filter = 'all') {
+        let logs = appData.logs;
+        if (filter !== 'all') logs = logs.filter(l => l.type === filter);
+
+        if (logs.length === 0) {
+            document.getElementById('logsContainer').innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 60px;">No logs yet! 🚀</div>';
+            return;
+        }
+
+        document.getElementById('logsContainer').innerHTML = logs.slice(0, 30).map(log => {
+            let content = '', borderColor = 'var(--accent)';
+            
+            if (log.type === 'study') {
+                borderColor = 'var(--brain)';
+                content = `<strong>📚 ${log.data.subject} - ${log.data.topic}</strong><br>
+                    <div style="margin-top: 8px; color: var(--text-muted);">⏱️ ${log.data.duration}min • 📍 ${log.data.location} • 
+                    <span style="color: var(--brain); font-weight: 700;">Grade: ${log.data.rating}</span> (+${log.data.score})</div>
+                    ${log.data.notes ? `<div style="margin-top: 10px; font-style: italic;">"${log.data.notes}"</div>` : ''}`;
+            } else if (log.type === 'gym') {
+                borderColor = 'var(--strength)';
+                content = `<strong>💪 ${log.data.gymDay}</strong><br>
+                    <div style="margin-top: 8px; color: var(--text-muted);">⏱️ ${log.data.duration}min • 
+                    <span style="color: var(--strength); font-weight: 700;">Grade: ${log.data.rating}</span> (+${log.data.score})</div>
+                    <pre style="margin-top: 10px; color: var(--text-muted); white-space: pre-wrap; font-family: inherit;">${log.data.exercises}</pre>`;
+            } else if (log.type === 'soul') {
+                borderColor = 'var(--spirit)';
+                content = `<strong>🙏 Gratitude</strong><br>
+                    <ul style="margin-top: 10px; padding-left: 20px; line-height: 1.8;">${log.data.gratitude.map(i => `<li>${i}</li>`).join('')}</ul>
+                    ${log.data.meditation ? `<div style="margin-top: 10px; font-style: italic;">🧘 ${log.data.meditation}</div>` : ''}`;
+            } else if (log.type === 'joy') {
+                borderColor = 'var(--joy)';
+                content = `<strong>✨ ${log.data.type} - ${log.data.title}</strong><br>
+                    <div style="margin-top: 10px; line-height: 1.6;">${log.data.content}</div>`;
+            } else if (log.type === 'willpower') {
+                borderColor = 'var(--willpower)';
+                content = `<strong>🛡️ Willpower (${log.data.count}/4)</strong><br>
+                    <ul style="margin-top: 10px; padding-left: 20px; line-height: 1.8;">${log.data.items.map(i => `<li>${i}</li>`).join('')}</ul>`;
+            } else if (log.type === 'sleep') {
+                borderColor = 'var(--recovery)';
+                content = `<strong>🌙 Bedtime: ${log.data.time}</strong><br>
+                    <div style="margin-top: 8px;"><span style="color: var(--recovery); font-weight: 700;">Score: ${log.data.score}/100</span></div>`;
+            }
+
+            return `<div class="log-item" style="border-left-color: ${borderColor};">
+                <div class="log-time">${log.timestamp}</div>${content}</div>`;
+        }).join('');
+    }
+
+    function switchLogTab(filter) {
+        document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        renderLogs(filter);
+    }
+
+    function showNotification(text, gradient) {
+        const notif = document.createElement('div');
+        notif.className = 'notification';
+        notif.style.background = gradient;
+        notif.textContent = text;
+        document.body.appendChild(notif);
+        setTimeout(() => notif.remove(), 3000);
+    }
+
+    init();
+    setInterval(saveData, 30000);
+    document.querySelectorAll('.modal').forEach(m => {
+        m.addEventListener('click', e => { if (e.target === m) closeModal(); });
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+    </div>
+</body>
+</html>
