@@ -1,398 +1,5 @@
-<div class="checklist" id="kohiList"></div>
-                </div>
-            </div>
-
-            <!-- Center Column - Hexagon -->
-            <div>
-                <div class="card">
-                    <div class="card-title" style="justify-content: center;">
-                        <i class="fa-solid fa-chart-radar"></i>
-                        Hexagon Status
-                    </div>
-                    <div class="hexagon-container">
-                        <div class="hexagon-canvas-wrapper">
-                            <canvas id="hexagonChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="hexagon-score" id="totalScore">0</div>
-                    <div class="score-label">Total Power</div>
-                    
-                    <!-- Grade Display -->
-                    <div class="grade-display">
-                        <div style="font-size: 0.9em; color: var(--text-muted); margin-bottom: 8px;">Today's Grade</div>
-                        <div class="grade-letter" id="gradeDisplay">E</div>
-                    </div>
-                </div>
-
-                <!-- Stats -->
-                <div class="stats-grid" style="margin-top: 20px;">
-                    <div class="stat-box" style="border-left-color: var(--strength);">
-                        <div class="stat-label">Strength</div>
-                        <div class="stat-value" id="statSTR" style="color: var(--strength);">0</div>
-                    </div>
-                    <div class="stat-box" style="border-left-color: var(--spirit);">
-                        <div class="stat-label">Spirit</div>
-                        <div class="stat-value" id="statSPR" style="color: var(--spirit);">0</div>
-                    </div>
-                    <div class="stat-box" style="border-left-color: var(--brain);">
-                        <div class="stat-label">Brain</div>
-                        <div class="stat-value" id="statINT" style="color: var(--brain);">0</div>
-                    </div>
-                    <div class="stat-box" style="border-left-color: var(--recovery);">
-                        <div class="stat-label">Recovery</div>
-                        <div class="stat-value" id="statREC" style="color: var(--recovery);">0</div>
-                    </div>
-                    <div class="stat-box" style="border-left-color: var(--joy);">
-                        <div class="stat-label">Joy</div>
-                        <div class="stat-value" id="statJOY" style="color: var(--joy);">0</div>
-                    </div>
-                    <div class="stat-box" style="border-left-color: var(--willpower);">
-                        <div class="stat-label">Willpower</div>
-                        <div class="stat-value" id="statWIL" style="color: var(--willpower);">0</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Column -->
-            <div>
-                <!-- Pomodoro -->
-                <div class="card pomodoro">
-                    <div class="card-title">
-                        <i class="fa-solid fa-clock"></i>
-                        Focus Timer
-                    </div>
-                    <div class="timer-circle">
-                        <div class="timer-inner">
-                            <div class="timer-display" id="timerDisplay">25:00</div>
-                        </div>
-                    </div>
-                    <div class="timer-controls">
-                        <button class="timer-btn start" onclick="startTimer()">
-                            <i class="fa-solid fa-play"></i> Start
-                        </button>
-                        <button class="timer-btn pause" onclick="pauseTimer()">
-                            <i class="fa-solid fa-pause"></i> Pause
-                        </button>
-                        <button class="timer-btn reset" onclick="resetTimer()">
-                            <i class="fa-solid fa-rotate-right"></i> Reset
-                        </button>
-                    </div>
-                    <select id="timerMode" style="margin-top: 15px;" onchange="changeTimerMode()">
-                        <option value="25">25/5 Pomodoro</option>
-                        <option value="50">50/10 Deep Work</option>
-                    </select>
-                </div>
-
-                <!-- Quick Actions -->
-                <div class="card" style="margin-top: 20px;">
-                    <div class="card-title">
-                        <i class="fa-solid fa-bolt"></i>
-                        Quick Actions
-                    </div>
-                    <div class="action-grid">
-                        <button class="action-btn btn-strength" onclick="openModal('gym')">
-                            <i class="fa-solid fa-dumbbell"></i><br>Gym
-                        </button>
-                        <button class="action-btn btn-brain" onclick="openModal('study')">
-                            <i class="fa-solid fa-book"></i><br>Study
-                        </button>
-                        <button class="action-btn btn-spirit" onclick="openModal('soul')">
-                            <i class="fa-solid fa-heart"></i><br>Soul
-                        </button>
-                        <button class="action-btn btn-joy" onclick="openModal('joy')">
-                            <i class="fa-solid fa-sparkles"></i><br>Creation
-                        </button>
-                        <button class="action-btn btn-willpower" onclick="openModal('willpower')">
-                            <i class="fa-solid fa-shield"></i><br>Willpower
-                        </button>
-                        <button class="action-btn btn-recovery" onclick="openModal('sleep')">
-                            <i class="fa-solid fa-moon"></i><br>Sleep
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bottom Section - Logs -->
-        <div class="card">
-            <div class="card-title">
-                <i class="fa-solid fa-clock-rotate-left"></i>
-                Activity Logs
-            </div>
-            <div class="tabs">
-                <button class="tab active" onclick="switchLogTab('all')">All</button>
-                <button class="tab" onclick="switchLogTab('study')">Study</button>
-                <button class="tab" onclick="switchLogTab('gym')">Gym</button>
-                <button class="tab" onclick="switchLogTab('soul')">Soul</button>
-                <button class="tab" onclick="switchLogTab('joy')">Creation</button>
-            </div>
-            <div id="logsContainer"></div>
-        </div>
-    </div>
-
-    <!-- Modals -->
-    <!-- Study Modal -->
-    <div class="modal" id="studyModal">
-        <div class="modal-content">
-            <h2><i class="fa-solid fa-graduation-cap"></i> Study Session</h2>
-            <select id="studySubject">
-                <option value="cpp">💻 C++ Programming</option>
-                <option value="kohi">🇯🇵 Japanese (Kohi)</option>
-                <option value="english">🇬🇧 English</option>
-                <option value="other">📚 Other</option>
-            </select>
-            <input type="text" id="studyTopic" placeholder="What did you study? (e.g., Pointers & References)">
-            <div class="grid-2">
-                <input type="number" id="studyDuration" placeholder="Duration (minutes)">
-                <input type="text" id="studyLocation" placeholder="Location (e.g., Library)">
-            </div>
-            
-            <div style="margin: 20px 0;">
-                <div style="font-size: 0.9em; color: var(--text-muted); margin-bottom: 12px; text-align: center;">
-                    📊 Rate Your Focus Quality
-                </div>
-                <div class="rating-grid">
-                    <div class="rating-btn rating-E" onclick="selectRating('E', 20)">E<br><small>Poor</small></div>
-                    <div class="rating-btn rating-D" onclick="selectRating('D', 40)">D<br><small>Fair</small></div>
-                    <div class="rating-btn rating-C" onclick="selectRating('C', 60)">C<br><small>Good</small></div>
-                    <div class="rating-btn rating-B" onclick="selectRating('B', 80)">B<br><small>Great</small></div>
-                    <div class="rating-btn rating-A" onclick="selectRating('A', 90)">A<br><small>Excellent</small></div>
-                </div>
-            </div>
-            
-            <textarea id="studyNotes" rows="3" placeholder="Key takeaways or insights..."></textarea>
-            <div class="grid-2">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveStudyLog()">Save (+Brain)</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Gym Modal -->
-    <div class="modal" id="gymModal">
-        <div class="modal-content">
-            <h2><i class="fa-solid fa-dumbbell"></i> Gym Session</h2>
-            <select id="gymDay">
-                <option value="push">💪 Push Day</option>
-                <option value="pull">🏋️ Pull Day</option>
-                <option value="legs">🦵 Leg Day</option>
-                <option value="cardio">🏃 Cardio</option>
-                <option value="other">🎯 Other</option>
-            </select>
-            <textarea id="gymExercises" rows="5" placeholder="Exercises performed:&#10;e.g., Bench Press 60kg x 8&#10;     Squat 80kg x 5&#10;     Deadlift 100kg x 3"></textarea>
-            <input type="number" id="gymDuration" placeholder="Total duration (minutes)">
-            
-            <div style="margin: 20px 0;">
-                <div style="font-size: 0.9em; color: var(--text-muted); margin-bottom: 12px; text-align: center;">
-                    💪 Rate Your Workout Intensity
-                </div>
-                <div class="rating-grid">
-                    <div class="rating-btn rating-E" onclick="selectRating('E', 20)">E<br><small>Light</small></div>
-                    <div class="rating-btn rating-D" onclick="selectRating('D', 40)">D<br><small>Easy</small></div>
-                    <div class="rating-btn rating-C" onclick="selectRating('C', 60)">C<br><small>Medium</small></div>
-                    <div class="rating-btn rating-B" onclick="selectRating('B', 80)">B<br><small>Hard</small></div>
-                    <div class="rating-btn rating-A" onclick="selectRating('A', 90)">A<br><small>Beast Mode</small></div>
-                </div>
-            </div>
-            
-            <div class="grid-2">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveGymLog()">Complete (+Strength)</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Soul Modal -->
-    <div class="modal" id="soulModal">
-        <div class="modal-content">
-            <h2><i class="fa-solid fa-spa"></i> Soul Nourishment</h2>
-            
-            <div style="margin: 20px 0;">
-                <div style="font-size: 0.9em; color: var(--text-muted); margin-bottom: 15px;">
-                    🙏 Three things I'm grateful for today:
-                </div>
-                <input type="text" id="gratitude1" placeholder="1. I'm grateful for..." style="background: rgba(16, 185, 129, 0.1); border-color: var(--spirit);">
-                <input type="text" id="gratitude2" placeholder="2. I'm grateful for..." style="background: rgba(16, 185, 129, 0.1); border-color: var(--spirit);">
-                <input type="text" id="gratitude3" placeholder="3. I'm grateful for..." style="background: rgba(16, 185, 129, 0.1); border-color: var(--spirit);">
-            </div>
-            
-            <textarea id="meditationNotes" rows="4" placeholder="🧘 Meditation reflection or mindfulness notes..."></textarea>
-            
-            <div class="grid-2">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveSoulLog()">Save (+Spirit)</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Joy/Creation Modal -->
-    <div class="modal" id="joyModal">
-        <div class="modal-content">
-            <h2><i class="fa-solid fa-lightbulb"></i> Creative Output</h2>
-            
-            <select id="joyType">
-                <option value="idea">💡 Idea for Blog Post</option>
-                <option value="reading">📚 Book/Article Reading</option>
-                <option value="video">🎥 Educational Video Notes</option>
-                <option value="creation">🎨 Creative Work</option>
-            </select>
-            
-            <input type="text" id="joyTitle" placeholder="Title or topic...">
-            <textarea id="joyContent" rows="6" placeholder="Write your thoughts, ideas, or key insights here..."></textarea>
-            
-            <div class="grid-2">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveJoyLog()">Save (+Joy)</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Willpower Modal -->
-    <div class="modal" id="willpowerModal">
-        <div class="modal-content">
-            <h2><i class="fa-solid fa-shield-halved"></i> Willpower Check</h2>
-            <p style="color: var(--text-muted); margin-bottom: 25px; text-align: center;">
-                Did you resist these temptations today?
-            </p>
-            
-            <div style="display: flex; flex-direction: column; gap: 15px;">
-                <div class="check-item" onclick="toggleWillpower(this)" data-value="social" style="background: rgba(236, 72, 153, 0.1); border-left-color: var(--willpower);">
-                    <div class="checkbox"></div>
-                    <div>
-                        <strong>📱 No mindless social media scrolling</strong>
-                        <div style="font-size: 0.85em; color: var(--text-muted); margin-top: 5px;">
-                            Limited to < 15 minutes with purpose
-                        </div>
-                    </div>
-                </div>
-
-                <div class="check-item" onclick="toggleWillpower(this)" data-value="message" style="background: rgba(236, 72, 153, 0.1); border-left-color: var(--willpower);">
-                    <div class="checkbox"></div>
-                    <div>
-                        <strong>💬 No meaningless chat responses</strong>
-                        <div style="font-size: 0.85em; color: var(--text-muted); margin-top: 5px;">
-                            Only replied to important messages
-                        </div>
-                    </div>
-                </div>
-
-                <div class="check-item" onclick="toggleWillpower(this)" data-value="notification" style="background: rgba(236, 72, 153, 0.1); border-left-color: var(--willpower);">
-                    <div class="checkbox"></div>
-                    <div>
-                        <strong>🔕 Notifications off during work</strong>
-                        <div style="font-size: 0.85em; color: var(--text-muted); margin-top: 5px;">
-                            Maintained focus mode in Pomodoro sessions
-                        </div>
-                    </div>
-                </div>
-
-                <div class="check-item" onclick="toggleWillpower(this)" data-value="procrastination" style="background: rgba(236, 72, 153, 0.1); border-left-color: var(--willpower);">
-                    <div class="checkbox"></div>
-                    <div>
-                        <strong>⏰ No procrastination on important tasks</strong>
-                        <div style="font-size: 0.85em; color: var(--text-muted); margin-top: 5px;">
-                            Did first things first in the morning
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid-2" style="margin-top: 25px;">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveWillpowerCheck()">Save (+Willpower)</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sleep Modal -->
-    <div class="modal" id="sleepModal">
-        <div class="modal-content">
-            <h2><i class="fa-solid fa-bed"></i> Sleep Tracking</h2>
-            <p style="color: var(--text-muted); margin-bottom: 20px; text-align: center;">
-                What time did you go to bed last night?
-            </p>
-            
-            <input type="time" id="sleepTime" value="23:00" style="font-size: 1.5em; text-align: center; padding: 20px;">
-            
-            <div style="margin: 25px 0; padding: 25px; background: rgba(139, 92, 246, 0.1); border-radius: 15px; border: 2px solid var(--recovery);">
-                <div style="font-size: 0.9em; color: var(--text-muted); text-align: center;">
-                    💤 Recovery Score Preview
-                </div>
-                <div style="font-size: 3em; font-weight: 800; color: var(--recovery); margin-top: 10px; text-align: center;" id="sleepScorePreview">100</div>
-            </div>
-            
-            <div style="font-size: 0.85em; color: var(--text-muted); line-height: 1.8; background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 10px;">
-                <strong>Scoring System:</strong><br>
-                ✨ Before 11pm: 100 points<br>
-                😊 11pm - 12am: 80 points<br>
-                😐 12am - 1am: 60 points<br>
-                😴 1am - 2am: 30 points<br>
-                💀 After 2am: 10 points
-            </div>
-            
-            <div class="grid-2" style="margin-top: 20px;">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveSleepLog()">Save (+Recovery)</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let appData = {
-            today: new Date().toDateString(),
-            hexagon: { STR: 0, SPR: 0, INT: 0, REC: 0, JOY: 0, WIL: 0 },
-            routine: [
-                { id: 'bed', text: '🛏️ Make your bed', done: false },
-                { id: 'water', text: '💧 Drink 2L water', done: false },
-                { id: 'skincare', text: '✨ Skincare routine', done: false },
-                { id: 'shower', text: '🚿 Morning shower', done: false }
-            ],
-            kohi: [
-                { id: 'vocab', text: '📝 Today\'s vocabulary', done: false },
-                { id: 'kanji', text: '㊗️ Today\'s Kanji', done: false },
-                { id: 'grammar', text: '📖 Today\'s grammar', done: false }
-            ],
-            logs: [],
-            streak: 1,
-            lastActive: new Date().toDateString(),
-            selectedRating: null,
-            selectedRatingValue: 0
-        };
-
-        let hexagonChart;
-        let timerInterval;
-        let timerMinutes = 25;
-        let timerSeconds = 0;
-        let timerRunning = false;
-        let particles = [];
-
-        // Initialize
-        function init() {
-            loadData();
-            updateDate();
-            renderRoutine();
-            renderKohi();
-            initHexagonChart();
-            updateAllStats();
-            renderLogs();
-            createParticles();
-            
-            document.getElementById('sleepTime').addEventListener('input', updateSleepPreview);
-            updateSleepPreview();
-        }
-
-        // Create animated particles
-        function createParticles() {
-            for (let i = 0; i < 30; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.animationDuration = (Math.random() * 10 + 5) + 's';
-                particle.style.animationDelay = Math.random() * 5 + 's';
-                particle.style.animation = `float ${Math.random() * 10 + 5}s ease-in-out infinite`;
+particle.style.animationDelay = Math.random() * 5 + 's';
                 document.body.appendChild(particle);
-                particles.push(particle);
             }
         }
 
@@ -432,7 +39,6 @@
             document.getElementById('dayStreak').textContent = appData.streak;
         }
 
-        // Routine & Kohi
         function renderRoutine() {
             const container = document.getElementById('routineList');
             container.innerHTML = appData.routine.map(item => `
@@ -475,7 +81,6 @@
             saveData();
         }
 
-        // Hexagon Chart
         function initHexagonChart() {
             const ctx = document.getElementById('hexagonChart').getContext('2d');
             hexagonChart = new Chart(ctx, {
@@ -546,7 +151,6 @@
             const total = Object.values(appData.hexagon).reduce((a, b) => a + b, 0);
             document.getElementById('totalScore').textContent = total;
             
-            // Calculate grade
             const avgScore = total / 6;
             let grade = 'E';
             let gradeClass = 'grade-E';
@@ -573,7 +177,6 @@
             document.getElementById('statWIL').textContent = appData.hexagon.WIL;
         }
 
-        // Pomodoro Timer
         function startTimer() {
             if (timerRunning) return;
             timerRunning = true;
@@ -582,8 +185,7 @@
                     if (timerMinutes === 0) {
                         clearInterval(timerInterval);
                         timerRunning = false;
-                        playSound();
-                        openPomodoroReview();
+                        alert('⏰ Time is up! Great work! 🎉');
                         return;
                     }
                     timerMinutes--;
@@ -619,31 +221,6 @@
             document.getElementById('timerDisplay').textContent = `${mins}:${secs}`;
         }
 
-        function playSound() {
-            const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj==');
-            audio.play().catch(e => {});
-        }
-
-        function openPomodoroReview() {
-            const topic = prompt('What did you just work on? 🎯');
-            if (topic) {
-                const rating = prompt('Rate your focus (E/D/C/B/A): ⭐');
-                if (rating) {
-                    let score = 20;
-                    if (rating.toUpperCase() === 'D') score = 40;
-                    else if (rating.toUpperCase() === 'C') score = 60;
-                    else if (rating.toUpperCase() === 'B') score = 80;
-                    else if (rating.toUpperCase() === 'A') score = 90;
-                    
-                    appData.hexagon.INT = Math.min(100, appData.hexagon.INT + score);
-                    updateHexagonChart();
-                    saveData();
-                    showNotification(`+${score} Brain Points! 🎉`);
-                }
-            }
-        }
-
-        // Rating Selection
         function selectRating(grade, value) {
             document.querySelectorAll('.rating-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
@@ -651,7 +228,6 @@
             appData.selectedRatingValue = value;
         }
 
-        // Modals
         function openModal(type) {
             closeModal();
             appData.selectedRating = null;
@@ -675,27 +251,18 @@
             const [hours, minutes] = time.split(':').map(Number);
             let score = 0;
             
-            if (hours < 23 || (hours === 23 && minutes === 0)) {
-                score = 100;
-            } else if (hours === 23) {
-                score = 100 - Math.round(minutes * 0.33);
-            } else if (hours === 0 || hours === 24) {
-                score = 80 - Math.round(minutes * 0.33);
-            } else if (hours === 1) {
-                score = 60 - Math.round(minutes * 0.5);
-            } else if (hours === 2) {
-                score = 30 - Math.round(minutes * 0.5);
-            } else if (hours >= 3 && hours < 12) {
-                score = 10;
-            } else {
-                score = 100;
-            }
+            if (hours < 23) score = 100;
+            else if (hours === 23) score = 100 - Math.round(minutes * 0.33);
+            else if (hours === 0) score = 80 - Math.round(minutes * 0.33);
+            else if (hours === 1) score = 60 - Math.round(minutes * 0.5);
+            else if (hours === 2) score = 30 - Math.round(minutes * 0.5);
+            else if (hours >= 3 && hours < 12) score = 10;
+            else score = 100;
             
             score = Math.max(0, Math.min(100, score));
             document.getElementById('sleepScorePreview').textContent = score;
         }
 
-        // Save Functions
         function saveStudyLog() {
             const subject = document.getElementById('studySubject').options[document.getElementById('studySubject').selectedIndex].text;
             const topic = document.getElementById('studyTopic').value;
@@ -704,12 +271,12 @@
             const notes = document.getElementById('studyNotes').value;
 
             if (!topic || !duration) {
-                alert('Please fill in all required fields!');
+                alert('Please fill in required fields!');
                 return;
             }
 
             if (!appData.selectedRating) {
-                alert('Please rate your focus quality!');
+                alert('Please rate your focus!');
                 return;
             }
 
@@ -731,7 +298,7 @@
             renderLogs();
             saveData();
             closeModal();
-            showNotification(`+${bonus} Brain Points! 📚`, 'brain');
+            showNotification(`+${bonus} Brain! 📚`, 'brain');
         }
 
         function saveGymLog() {
@@ -740,12 +307,12 @@
             const duration = document.getElementById('gymDuration').value;
 
             if (!exercises || !duration) {
-                alert('Please fill in all required fields!');
+                alert('Please fill in all fields!');
                 return;
             }
 
             if (!appData.selectedRating) {
-                alert('Please rate your workout intensity!');
+                alert('Please rate intensity!');
                 return;
             }
 
@@ -765,7 +332,7 @@
             renderLogs();
             saveData();
             closeModal();
-            showNotification(`+${bonus} Strength Points! 💪`, 'strength');
+            showNotification(`+${bonus} Strength! 💪`, 'strength');
         }
 
         function saveSoulLog() {
@@ -775,7 +342,7 @@
             const meditation = document.getElementById('meditationNotes').value;
 
             if (!g1 || !g2 || !g3) {
-                alert('Please write all 3 gratitude items!');
+                alert('Write 3 gratitude items!');
                 return;
             }
 
@@ -797,7 +364,7 @@
             renderLogs();
             saveData();
             closeModal();
-            showNotification(`+${bonus} Spirit Points! 🙏`, 'spirit');
+            showNotification(`+${bonus} Spirit! 🙏`, 'spirit');
         }
 
         function saveJoyLog() {
@@ -806,7 +373,7 @@
             const content = document.getElementById('joyContent').value;
 
             if (!title || !content) {
-                alert('Please fill in all fields!');
+                alert('Fill all fields!');
                 return;
             }
 
@@ -826,7 +393,7 @@
             renderLogs();
             saveData();
             closeModal();
-            showNotification(`+${bonus} Joy Points! ✨`, 'joy');
+            showNotification(`+${bonus} Joy! ✨`, 'joy');
         }
 
         function saveWillpowerCheck() {
@@ -834,7 +401,7 @@
             const count = checks.length;
 
             if (count === 0) {
-                alert('Select at least 1 item!');
+                alert('Select at least 1!');
                 return;
             }
 
@@ -855,34 +422,26 @@
             renderLogs();
             saveData();
             closeModal();
-            showNotification(`+${bonus} Willpower Points! 🛡️`, 'willpower');
+            showNotification(`+${bonus} Willpower! 🛡️`, 'willpower');
         }
 
         function saveSleepLog() {
             const time = document.getElementById('sleepTime').value;
             if (!time) {
-                alert('Please select sleep time!');
+                alert('Select sleep time!');
                 return;
             }
 
             const [hours, minutes] = time.split(':').map(Number);
             let score = 0;
             
-            if (hours < 23 || (hours === 23 && minutes === 0)) {
-                score = 100;
-            } else if (hours === 23) {
-                score = 100 - Math.round(minutes * 0.33);
-            } else if (hours === 0 || hours === 24) {
-                score = 80 - Math.round(minutes * 0.33);
-            } else if (hours === 1) {
-                score = 60 - Math.round(minutes * 0.5);
-            } else if (hours === 2) {
-                score = 30 - Math.round(minutes * 0.5);
-            } else if (hours >= 3 && hours < 12) {
-                score = 10;
-            } else {
-                score = 100;
-            }
+            if (hours < 23) score = 100;
+            else if (hours === 23) score = 100 - Math.round(minutes * 0.33);
+            else if (hours === 0) score = 80 - Math.round(minutes * 0.33);
+            else if (hours === 1) score = 60 - Math.round(minutes * 0.5);
+            else if (hours === 2) score = 30 - Math.round(minutes * 0.5);
+            else if (hours >= 3 && hours < 12) score = 10;
+            else score = 100;
 
             score = Math.max(0, Math.min(100, score));
             appData.hexagon.REC = score;
@@ -897,10 +456,9 @@
             renderLogs();
             saveData();
             closeModal();
-            showNotification(`+${score} Recovery Points! 🌙`, 'recovery');
+            showNotification(`+${score} Recovery! 🌙`, 'recovery');
         }
 
-        // Logs
         function renderLogs(filter = 'all') {
             const container = document.getElementById('logsContainer');
             let logs = appData.logs;
@@ -910,7 +468,7 @@
             }
 
             if (logs.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 60px 20px; font-size: 1.1em;">No logs yet. Start your journey! 🚀</div>';
+                container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 60px;">No logs yet! 🚀</div>';
                 return;
             }
 
@@ -920,63 +478,37 @@
                 
                 if (log.type === 'study') {
                     borderColor = 'var(--brain)';
-                    content = `
-                        <strong>📚 ${log.data.subject} - ${log.data.topic}</strong><br>
-                        <div style="margin-top: 8px; color: var(--text-muted);">
-                            ⏱️ ${log.data.duration}min • 📍 ${log.data.location} • 
-                            <span style="color: var(--brain); font-weight: 700;">Grade: ${log.data.rating}</span> (+${log.data.score})
-                        </div>
-                        ${log.data.notes ? `<div style="margin-top: 10px; font-style: italic; color: var(--text-muted);">"${log.data.notes}"</div>` : ''}
-                    `;
+                    content = `<strong>📚 ${log.data.subject} - ${log.data.topic}</strong><br>
+                        <div style="margin-top: 8px; color: var(--text-muted);">⏱️ ${log.data.duration}min • 📍 ${log.data.location} • 
+                        <span style="color: var(--brain); font-weight: 700;">Grade: ${log.data.rating}</span> (+${log.data.score})</div>
+                        ${log.data.notes ? `<div style="margin-top: 10px; font-style: italic;">"${log.data.notes}"</div>` : ''}`;
                 } else if (log.type === 'gym') {
                     borderColor = 'var(--strength)';
-                    content = `
-                        <strong>💪 ${log.data.gymDay}</strong><br>
-                        <div style="margin-top: 8px; color: var(--text-muted);">
-                            ⏱️ ${log.data.duration}min • 
-                            <span style="color: var(--strength); font-weight: 700;">Grade: ${log.data.rating}</span> (+${log.data.score})
-                        </div>
-                        <pre style="margin-top: 10px; color: var(--text-muted); white-space: pre-wrap; font-family: inherit; font-size: 0.9em;">${log.data.exercises}</pre>
-                    `;
+                    content = `<strong>💪 ${log.data.gymDay}</strong><br>
+                        <div style="margin-top: 8px; color: var(--text-muted);">⏱️ ${log.data.duration}min • 
+                        <span style="color: var(--strength); font-weight: 700;">Grade: ${log.data.rating}</span> (+${log.data.score})</div>
+                        <pre style="margin-top: 10px; color: var(--text-muted); white-space: pre-wrap; font-family: inherit;">${log.data.exercises}</pre>`;
                 } else if (log.type === 'soul') {
                     borderColor = 'var(--spirit)';
-                    content = `
-                        <strong>🙏 Gratitude Journal</strong><br>
-                        <ul style="margin-top: 10px; color: var(--text-muted); padding-left: 20px; line-height: 1.8;">
-                            ${log.data.gratitude.map(i => `<li>${i}</li>`).join('')}
-                        </ul>
-                        ${log.data.meditation ? `<div style="margin-top: 10px; color: var(--text-muted); font-style: italic;">🧘 ${log.data.meditation}</div>` : ''}
-                    `;
+                    content = `<strong>🙏 Gratitude</strong><br>
+                        <ul style="margin-top: 10px; padding-left: 20px; line-height: 1.8;">${log.data.gratitude.map(i => `<li>${i}</li>`).join('')}</ul>
+                        ${log.data.meditation ? `<div style="margin-top: 10px; font-style: italic;">🧘 ${log.data.meditation}</div>` : ''}`;
                 } else if (log.type === 'joy') {
                     borderColor = 'var(--joy)';
-                    content = `
-                        <strong>✨ ${log.data.type} - ${log.data.title}</strong><br>
-                        <div style="margin-top: 10px; color: var(--text-muted); line-height: 1.6;">${log.data.content}</div>
-                    `;
+                    content = `<strong>✨ ${log.data.type} - ${log.data.title}</strong><br>
+                        <div style="margin-top: 10px; line-height: 1.6;">${log.data.content}</div>`;
                 } else if (log.type === 'willpower') {
                     borderColor = 'var(--willpower)';
-                    content = `
-                        <strong>🛡️ Willpower Check (${log.data.count}/4)</strong><br>
-                        <ul style="margin-top: 10px; color: var(--text-muted); padding-left: 20px; line-height: 1.8;">
-                            ${log.data.items.map(i => `<li>${i}</li>`).join('')}
-                        </ul>
-                    `;
+                    content = `<strong>🛡️ Willpower (${log.data.count}/4)</strong><br>
+                        <ul style="margin-top: 10px; padding-left: 20px; line-height: 1.8;">${log.data.items.map(i => `<li>${i}</li>`).join('')}</ul>`;
                 } else if (log.type === 'sleep') {
                     borderColor = 'var(--recovery)';
-                    content = `
-                        <strong>🌙 Bedtime: ${log.data.time}</strong><br>
-                        <div style="margin-top: 8px;">
-                            <span style="color: var(--recovery); font-weight: 700; font-size: 1.2em;">Recovery Score: ${log.data.score}/100</span>
-                        </div>
-                    `;
+                    content = `<strong>🌙 Bedtime: ${log.data.time}</strong><br>
+                        <div style="margin-top: 8px;"><span style="color: var(--recovery); font-weight: 700;">Score: ${log.data.score}/100</span></div>`;
                 }
 
-                return `
-                    <div class="log-item" style="border-left-color: ${borderColor};">
-                        <div class="log-time">${log.timestamp}</div>
-                        ${content}
-                    </div>
-                `;
+                return `<div class="log-item" style="border-left-color: ${borderColor};">
+                    <div class="log-time">${log.timestamp}</div>${content}</div>`;
             }).join('');
         }
 
@@ -1009,26 +541,17 @@
             }, 3000);
         }
 
-        // Initialize app
         init();
-
-        // Auto-save every 30 seconds
         setInterval(saveData, 30000);
 
-        // Close modal on outside click
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeModal();
-                }
+                if (e.target === this) closeModal();
             });
         });
 
-        // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeModal();
-            }
+            if (e.key === 'Escape') closeModal();
         });
     </script>
 </body>
@@ -1037,8 +560,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Life OS - Hexagon System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Life OS - Personal Development System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     
@@ -1073,13 +596,17 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 0.6; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.05); }
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
         }
 
         @keyframes shimmer {
             0% { background-position: -1000px 0; }
             100% { background-position: 1000px 0; }
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -1109,15 +636,7 @@
             z-index: 0;
         }
 
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Animated particles */
+        /* Particles */
         .particle {
             position: fixed;
             width: 4px;
@@ -1129,13 +648,174 @@
             z-index: 0;
         }
 
-        /* Header */
-        .header {
+        /* Hero Section */
+        .hero {
+            position: relative;
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 20px;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.2) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+        }
+
+        .hero-title {
+            font-size: 5em;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), var(--secondary), var(--strength));
+            background-size: 200% 200%;
+            animation: gradientShift 5s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5em;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .hero-icon {
+            font-size: 6em;
+            margin-bottom: 30px;
+            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px var(--accent));
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: float 2s ease-in-out infinite;
+            color: var(--text-muted);
+            font-size: 2em;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 15px 0;
+        }
+
+        .navbar-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            padding: 25px 35px;
+        }
+
+        .navbar-brand {
+            font-size: 1.5em;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .navbar-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .navbar-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .navbar-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s;
+        }
+
+        .navbar-link:hover {
+            color: var(--text-main);
+        }
+
+        .navbar-link:hover::after {
+            width: 100%;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Section Headers */
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: 2.5em;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .section-subtitle {
+            font-size: 1.1em;
+            color: var(--text-muted);
+        }
+
+        /* User Info Card */
+        .user-info-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 30px 40px;
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
@@ -1145,7 +825,7 @@
             overflow: hidden;
         }
 
-        .header::before {
+        .user-info-card::before {
             content: '';
             position: absolute;
             top: 0;
@@ -1156,27 +836,17 @@
             animation: shimmer 3s infinite;
         }
 
-        .logo { 
-            font-size: 1.8em; 
-            font-weight: 800; 
-            background: linear-gradient(135deg, var(--accent), var(--secondary), var(--strength));
-            background-size: 200% 200%;
-            animation: gradientShift 5s ease infinite;
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .user-info-left h2 {
+            font-size: 1.8em;
+            margin-bottom: 8px;
         }
 
-        .logo i {
-            animation: float 3s ease-in-out infinite;
+        .user-info-right {
+            text-align: right;
         }
 
-        .date-display { text-align: right; }
-        .current-date { 
-            font-size: 1.2em; 
-            color: var(--text-main); 
+        .current-date {
+            font-size: 1.2em;
             font-weight: 700;
             text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
         }
@@ -1184,27 +854,15 @@
         .streak-badge {
             display: inline-block;
             background: linear-gradient(135deg, var(--strength), var(--joy));
-            padding: 6px 15px;
-            border-radius: 20px;
+            padding: 8px 20px;
+            border-radius: 25px;
             font-weight: 800;
-            margin-top: 8px;
+            margin-top: 12px;
             box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
             animation: pulse 2s ease-in-out infinite;
         }
 
-        /* Main Grid */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1.5fr 1fr;
-            gap: 25px;
-            margin-bottom: 25px;
-        }
-
-        @media (max-width: 1200px) {
-            .main-grid { grid-template-columns: 1fr; }
-        }
-
-        /* Cards with animated borders */
+        /* Cards */
         .card {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
@@ -1242,7 +900,6 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            position: relative;
         }
 
         .card-title i {
@@ -1251,6 +908,18 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: float 2s ease-in-out infinite;
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 1200px) {
+            .main-grid { grid-template-columns: 1fr; }
         }
 
         /* Hexagon Chart */
@@ -1334,7 +1003,7 @@
             animation: pulse 1.5s ease-in-out infinite;
         }
 
-        /* Quick Checklist */
+        /* Checklist */
         .checklist {
             display: flex;
             flex-direction: column;
@@ -1403,7 +1072,6 @@
         /* Pomodoro Timer */
         .pomodoro {
             text-align: center;
-            position: relative;
         }
 
         .timer-circle {
@@ -1425,7 +1093,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
             box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
         }
 
@@ -1535,7 +1202,6 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
-            margin-bottom: 20px;
         }
 
         .stat-box {
@@ -1739,13 +1405,6 @@
         .rating-C { border-color: #fbbf24 !important; color: #fbbf24; }
         .rating-B { border-color: #3b82f6 !important; color: #3b82f6; }
         .rating-A { border-color: #10b981 !important; color: #10b981; }
-        .rating-S { 
-            border-color: #ef4444 !important; 
-            background: linear-gradient(135deg, #fbbf24, #ef4444);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 900;
-        }
 
         /* Logs */
         .log-item {
@@ -1816,6 +1475,77 @@
             box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
         }
 
+        /* Footer */
+        .footer {
+            margin-top: 80px;
+            padding: 40px 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            position: relative;
+        }
+
+        .footer-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .footer-section p, .footer-section a {
+            color: var(--text-muted);
+            line-height: 1.8;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: var(--accent);
+            transform: translateX(5px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid var(--glass-border);
+            color: var(--text-muted);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            transition: all 0.3s;
+            color: var(--text-muted);
+        }
+
+        .social-link:hover {
+            background: var(--accent);
+            color: #000;
+            transform: translateY(-3px);
+        }
+
         /* Scrollbar */
         ::-webkit-scrollbar {
             width: 10px;
@@ -1852,22 +1582,69 @@
             from { transform: translateX(400px); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 3em; }
+            .hero-subtitle { font-size: 1.2em; }
+            .navbar-links { display: none; }
+            .user-info-card { flex-direction: column; text-align: center; }
+            .user-info-right { margin-top: 20px; }
+            .action-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div>
-                <div class="logo">
-                    <i class="fa-solid fa-hexagon"></i>
-                    Life OS
-                </div>
-                <div style="font-size: 0.9em; color: var(--text-muted); margin-top: 8px;">
-                    Hexagon System - Track Your Evolution
-                </div>
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-content">
+            <div class="hero-icon">
+                <i class="fa-solid fa-hexagon"></i>
             </div>
-            <div class="date-display">
+            <h1 class="hero-title">Life OS</h1>
+            <p class="hero-subtitle">Transform Your Life with Hexagon System</p>
+            <p style="color: var(--text-muted); max-width: 800px; margin: 0 auto; line-height: 1.8;">
+                Track your strength, spirit, brain power, recovery, joy, and willpower. 
+                Build the ultimate version of yourself, one day at a time.
+            </p>
+        </div>
+        <div class="scroll-indicator">
+            <i class="fa-solid fa-chevron-down"></i>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="navbar-brand">
+                <i class="fa-solid fa-hexagon"></i>
+                Life OS
+            </div>
+            <div class="navbar-links">
+                <a href="#dashboard" class="navbar-link">Dashboard</a>
+                <a href="#tracker" class="navbar-link">Tracker</a>
+                <a href="#stats" class="navbar-link">Statistics</a>
+                <a href="#logs" class="navbar-link">Logs</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container" id="dashboard">
+        <!-- Section Header -->
+        <div class="section-header">
+            <h2 class="section-title">Your Dashboard</h2>
+            <p class="section-subtitle">Monitor your daily progress and hexagon stats</p>
+        </div>
+
+        <!-- User Info Card -->
+        <div class="user-info-card">
+            <div class="user-info-left">
+                <h2>Welcome Back!</h2>
+                <p style="color: var(--text-muted);">Keep building your best self</p>
+            </div>
+            <div class="user-info-right">
                 <div class="current-date" id="currentDate"></div>
                 <div class="streak-badge">
                     🔥 <span id="dayStreak">0</span> Day Streak
@@ -1876,7 +1653,7 @@
         </div>
 
         <!-- Main Grid -->
-        <div class="main-grid">
+        <div class="main-grid" id="tracker">
             <!-- Left Column -->
             <div>
                 <!-- Daily Routine -->
@@ -1897,4 +1674,423 @@
                         <i class="fa-solid fa-language"></i>
                         Kohi Daily
                     </div>
-                    <div class="checklist" id="kohiList">
+                    <div class="checklist" id="kohiList"></div>
+                </div>
+            </div>
+
+            <!-- Center Column - Hexagon -->
+            <div>
+                <div class="card">
+                    <div class="card-title" style="justify-content: center;">
+                        <i class="fa-solid fa-chart-radar"></i>
+                        Hexagon Status
+                    </div>
+                    <div class="hexagon-container">
+                        <div class="hexagon-canvas-wrapper">
+                            <canvas id="hexagonChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="hexagon-score" id="totalScore">0</div>
+                    <div class="score-label">Total Power</div>
+                    
+                    <!-- Grade Display -->
+                    <div class="grade-display">
+                        <div style="font-size: 0.9em; color: var(--text-muted); margin-bottom: 8px;">Today's Grade</div>
+                        <div class="grade-letter" id="gradeDisplay">E</div>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid" id="stats" style="margin-top: 20px;">
+                    <div class="stat-box" style="border-left-color: var(--strength);">
+                        <div class="stat-label">Strength</div>
+                        <div class="stat-value" id="statSTR" style="color: var(--strength);">0</div>
+                    </div>
+                    <div class="stat-box" style="border-left-color: var(--spirit);">
+                        <div class="stat-label">Spirit</div>
+                        <div class="stat-value" id="statSPR" style="color: var(--spirit);">0</div>
+                    </div>
+                    <div class="stat-box" style="border-left-color: var(--brain);">
+                        <div class="stat-label">Brain</div>
+                        <div class="stat-value" id="statINT" style="color: var(--brain);">0</div>
+                    </div>
+                    <div class="stat-box" style="border-left-color: var(--recovery);">
+                        <div class="stat-label">Recovery</div>
+                        <div class="stat-value" id="statREC" style="color: var(--recovery);">0</div>
+                    </div>
+                    <div class="stat-box" style="border-left-color: var(--joy);">
+                        <div class="stat-label">Joy</div>
+                        <div class="stat-value" id="statJOY" style="color: var(--joy);">0</div>
+                    </div>
+                    <div class="stat-box" style="border-left-color: var(--willpower);">
+                        <div class="stat-label">Willpower</div>
+                        <div class="stat-value" id="statWIL" style="color: var(--willpower);">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div>
+                <!-- Pomodoro -->
+                <div class="card pomodoro">
+                    <div class="card-title">
+                        <i class="fa-solid fa-clock"></i>
+                        Focus Timer
+                    </div>
+                    <div class="timer-circle">
+                        <div class="timer-inner">
+                            <div class="timer-display" id="timerDisplay">25:00</div>
+                        </div>
+                    </div>
+                    <div class="timer-controls">
+                        <button class="timer-btn start" onclick="startTimer()">
+                            <i class="fa-solid fa-play"></i> Start
+                        </button>
+                        <button class="timer-btn pause" onclick="pauseTimer()">
+                            <i class="fa-solid fa-pause"></i> Pause
+                        </button>
+                        <button class="timer-btn reset" onclick="resetTimer()">
+                            <i class="fa-solid fa-rotate-right"></i> Reset
+                        </button>
+                    </div>
+                    <select id="timerMode" style="margin-top: 15px;" onchange="changeTimerMode()">
+                        <option value="25">25/5 Pomodoro</option>
+                        <option value="50">50/10 Deep Work</option>
+                    </select>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card" style="margin-top: 20px;">
+                    <div class="card-title">
+                        <i class="fa-solid fa-bolt"></i>
+                        Quick Actions
+                    </div>
+                    <div class="action-grid">
+                        <button class="action-btn btn-strength" onclick="openModal('gym')">
+                            <i class="fa-solid fa-dumbbell"></i><br>Gym
+                        </button>
+                        <button class="action-btn btn-brain" onclick="openModal('study')">
+                            <i class="fa-solid fa-book"></i><br>Study
+                        </button>
+                        <button class="action-btn btn-spirit" onclick="openModal('soul')">
+                            <i class="fa-solid fa-heart"></i><br>Soul
+                        </button>
+                        <button class="action-btn btn-joy" onclick="openModal('joy')">
+                            <i class="fa-solid fa-sparkles"></i><br>Creation
+                        </button>
+                        <button class="action-btn btn-willpower" onclick="openModal('willpower')">
+                            <i class="fa-solid fa-shield"></i><br>Willpower
+                        </button>
+                        <button class="action-btn btn-recovery" onclick="openModal('sleep')">
+                            <i class="fa-solid fa-moon"></i><br>Sleep
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logs Section -->
+        <div class="card" id="logs">
+            <div class="card-title">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                Activity Logs
+            </div>
+            <div class="tabs">
+                <button class="tab active" onclick="switchLogTab('all')">All</button>
+                <button class="tab" onclick="switchLogTab('study')">Study</button>
+                <button class="tab" onclick="switchLogTab('gym')">Gym</button>
+                <button class="tab" onclick="switchLogTab('soul')">Soul</button>
+                <button class="tab" onclick="switchLogTab('joy')">Creation</button>
+            </div>
+            <div id="logsContainer"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3><i class="fa-solid fa-hexagon"></i> Life OS</h3>
+                <p>A personal development tracking system designed to help you build the ultimate version of yourself through the Hexagon System methodology.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="social-link"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fa-brands fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="#dashboard">Dashboard</a>
+                <a href="#tracker">Tracker</a>
+                <a href="#stats">Statistics</a>
+                <a href="#logs">Activity Logs</a>
+            </div>
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <a href="#">User Guide</a>
+                <a href="#">Best Practices</a>
+                <a href="#">Community Forum</a>
+                <a href="#">Support</a>
+            </div>
+            <div class="footer-section">
+                <h3>About</h3>
+                <p>Version 2.0</p>
+                <p>Built with passion for self-improvement</p>
+                <p>© 2025 Life OS. All rights reserved.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>Made with <i class="fa-solid fa-heart" style="color: var(--strength);"></i> for personal growth enthusiasts</p>
+        </div>
+    </footer>
+
+    <!-- Modals (same as before) -->
+    <div class="modal" id="studyModal">
+        <div class="modal-content">
+            <h2><i class="fa-solid fa-graduation-cap"></i> Study Session</h2>
+            <select id="studySubject">
+                <option value="cpp">💻 C++ Programming</option>
+                <option value="kohi">🇯🇵 Japanese (Kohi)</option>
+                <option value="english">🇬🇧 English</option>
+                <option value="other">📚 Other</option>
+            </select>
+            <input type="text" id="studyTopic" placeholder="What did you study?">
+            <div class="grid-2">
+                <input type="number" id="studyDuration" placeholder="Duration (minutes)">
+                <input type="text" id="studyLocation" placeholder="Location">
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <div style="font-size: 0.9em; color: var(--text-muted); margin-bottom: 12px; text-align: center;">
+                    📊 Rate Your Focus Quality
+                </div>
+                <div class="rating-grid">
+                    <div class="rating-btn rating-E" onclick="selectRating('E', 20)">E<br><small>Poor</small></div>
+                    <div class="rating-btn rating-D" onclick="selectRating('D', 40)">D<br><small>Fair</small></div>
+                    <div class="rating-btn rating-C" onclick="selectRating('C', 60)">C<br><small>Good</small></div>
+                    <div class="rating-btn rating-B" onclick="selectRating('B', 80)">B<br><small>Great</small></div>
+                    <div class="rating-btn rating-A" onclick="selectRating('A', 90)">A<br><small>Perfect</small></div>
+                </div>
+            </div>
+            
+            <textarea id="studyNotes" rows="3" placeholder="Key takeaways..."></textarea>
+            <div class="grid-2">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveStudyLog()">Save (+Brain)</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="gymModal">
+        <div class="modal-content">
+            <h2><i class="fa-solid fa-dumbbell"></i> Gym Session</h2>
+            <select id="gymDay">
+                <option value="push">💪 Push Day</option>
+                <option value="pull">🏋️ Pull Day</option>
+                <option value="legs">🦵 Leg Day</option>
+                <option value="cardio">🏃 Cardio</option>
+            </select>
+            <textarea id="gymExercises" rows="5" placeholder="Exercises:&#10;Bench Press 60kg x 8&#10;Squat 80kg x 5"></textarea>
+            <input type="number" id="gymDuration" placeholder="Duration (minutes)">
+            
+            <div style="margin: 20px 0;">
+                <div style="font-size: 0.9em; color: var(--text-muted); margin-bottom: 12px; text-align: center;">
+                    💪 Rate Workout Intensity
+                </div>
+                <div class="rating-grid">
+                    <div class="rating-btn rating-E" onclick="selectRating('E', 20)">E<br><small>Light</small></div>
+                    <div class="rating-btn rating-D" onclick="selectRating('D', 40)">D<br><small>Easy</small></div>
+                    <div class="rating-btn rating-C" onclick="selectRating('C', 60)">C<br><small>Medium</small></div>
+                    <div class="rating-btn rating-B" onclick="selectRating('B', 80)">B<br><small>Hard</small></div>
+                    <div class="rating-btn rating-A" onclick="selectRating('A', 90)">A<br><small>Beast</small></div>
+                </div>
+            </div>
+            
+            <div class="grid-2">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveGymLog()">Save (+Strength)</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="soulModal">
+        <div class="modal-content">
+            <h2><i class="fa-solid fa-spa"></i> Soul Nourishment</h2>
+            
+            <div style="margin: 20px 0;">
+                <div style="font-size: 0.9em; color: var(--text-muted); margin-bottom: 15px;">
+                    🙏 Three things I'm grateful for:
+                </div>
+                <input type="text" id="gratitude1" placeholder="1. I'm grateful for..." style="background: rgba(16, 185, 129, 0.1); border-color: var(--spirit);">
+                <input type="text" id="gratitude2" placeholder="2. I'm grateful for..." style="background: rgba(16, 185, 129, 0.1); border-color: var(--spirit);">
+                <input type="text" id="gratitude3" placeholder="3. I'm grateful for..." style="background: rgba(16, 185, 129, 0.1); border-color: var(--spirit);">
+            </div>
+            
+            <textarea id="meditationNotes" rows="4" placeholder="🧘 Meditation reflection..."></textarea>
+            
+            <div class="grid-2">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveSoulLog()">Save (+Spirit)</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="joyModal">
+        <div class="modal-content">
+            <h2><i class="fa-solid fa-lightbulb"></i> Creative Output</h2>
+            
+            <select id="joyType">
+                <option value="idea">💡 Blog Post Idea</option>
+                <option value="reading">📚 Reading Notes</option>
+                <option value="video">🎥 Video Notes</option>
+                <option value="creation">🎨 Creative Work</option>
+            </select>
+            
+            <input type="text" id="joyTitle" placeholder="Title or topic...">
+            <textarea id="joyContent" rows="6" placeholder="Your thoughts and insights..."></textarea>
+            
+            <div class="grid-2">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveJoyLog()">Save (+Joy)</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="willpowerModal">
+        <div class="modal-content">
+            <h2><i class="fa-solid fa-shield-halved"></i> Willpower Check</h2>
+            <p style="color: var(--text-muted); margin-bottom: 25px; text-align: center;">
+                Did you resist these temptations today?
+            </p>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <div class="check-item" onclick="toggleWillpower(this)" style="background: rgba(236, 72, 153, 0.1); border-left-color: var(--willpower);">
+                    <div class="checkbox"></div>
+                    <div>
+                        <strong>📱 No mindless scrolling</strong>
+                        <div style="font-size: 0.85em; color: var(--text-muted); margin-top: 5px;">
+                            Limited social media < 15 min
+                        </div>
+                    </div>
+                </div>
+
+                <div class="check-item" onclick="toggleWillpower(this)" style="background: rgba(236, 72, 153, 0.1); border-left-color: var(--willpower);">
+                    <div class="checkbox"></div>
+                    <div>
+                        <strong>💬 No meaningless chats</strong>
+                        <div style="font-size: 0.85em; color: var(--text-muted); margin-top: 5px;">
+                            Only important messages
+                        </div>
+                    </div>
+                </div>
+
+                <div class="check-item" onclick="toggleWillpower(this)" style="background: rgba(236, 72, 153, 0.1); border-left-color: var(--willpower);">
+                    <div class="checkbox"></div>
+                    <div>
+                        <strong>🔕 Focus mode active</strong>
+                        <div style="font-size: 0.85em; color: var(--text-muted); margin-top: 5px;">
+                            Notifications off during work
+                        </div>
+                    </div>
+                </div>
+
+                <div class="check-item" onclick="toggleWillpower(this)" style="background: rgba(236, 72, 153, 0.1); border-left-color: var(--willpower);">
+                    <div class="checkbox"></div>
+                    <div>
+                        <strong>⏰ No procrastination</strong>
+                        <div style="font-size: 0.85em; color: var(--text-muted); margin-top: 5px;">
+                            First things first
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-top: 25px;">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveWillpowerCheck()">Save (+Willpower)</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="sleepModal">
+        <div class="modal-content">
+            <h2><i class="fa-solid fa-bed"></i> Sleep Tracking</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px; text-align: center;">
+                What time did you go to bed?
+            </p>
+            
+            <input type="time" id="sleepTime" value="23:00" style="font-size: 1.5em; text-align: center; padding: 20px;">
+            
+            <div style="margin: 25px 0; padding: 25px; background: rgba(139, 92, 246, 0.1); border-radius: 15px; border: 2px solid var(--recovery);">
+                <div style="font-size: 0.9em; color: var(--text-muted); text-align: center;">
+                    💤 Recovery Score Preview
+                </div>
+                <div style="font-size: 3em; font-weight: 800; color: var(--recovery); margin-top: 10px; text-align: center;" id="sleepScorePreview">100</div>
+            </div>
+            
+            <div style="font-size: 0.85em; color: var(--text-muted); line-height: 1.8; background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 10px;">
+                <strong>Scoring:</strong><br>
+                ✨ Before 11pm: 100<br>
+                😊 11pm-12am: 80<br>
+                😐 12am-1am: 60<br>
+                😴 1am-2am: 30<br>
+                💀 After 2am: 10
+            </div>
+            
+            <div class="grid-2" style="margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveSleepLog()">Save (+Recovery)</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let appData = {
+            today: new Date().toDateString(),
+            hexagon: { STR: 0, SPR: 0, INT: 0, REC: 0, JOY: 0, WIL: 0 },
+            routine: [
+                { id: 'bed', text: '🛏️ Make your bed', done: false },
+                { id: 'water', text: '💧 Drink 2L water', done: false },
+                { id: 'skincare', text: '✨ Skincare routine', done: false },
+                { id: 'shower', text: '🚿 Morning shower', done: false }
+            ],
+            kohi: [
+                { id: 'vocab', text: '📝 Vocabulary', done: false },
+                { id: 'kanji', text: '㊗️ Kanji', done: false },
+                { id: 'grammar', text: '📖 Grammar', done: false }
+            ],
+            logs: [],
+            streak: 1,
+            lastActive: new Date().toDateString(),
+            selectedRating: null,
+            selectedRatingValue: 0
+        };
+
+        let hexagonChart;
+        let timerInterval;
+        let timerMinutes = 25;
+        let timerSeconds = 0;
+        let timerRunning = false;
+
+        function init() {
+            loadData();
+            updateDate();
+            renderRoutine();
+            renderKohi();
+            initHexagonChart();
+            updateAllStats();
+            renderLogs();
+            createParticles();
+            
+            document.getElementById('sleepTime').addEventListener('input', updateSleepPreview);
+            updateSleepPreview();
+        }
+
+        function createParticles() {
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animation = `float ${Math.random() * 10 + 5}s ease-in-out infinite`;
+                particle
