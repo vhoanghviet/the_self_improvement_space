@@ -9,20 +9,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     <style>
         :root {
-            --bg-dark: #0a0e1a;
-            --glass-bg: rgba(20, 25, 45, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --accent: #00d9ff;
-            --secondary: #a855f7;
-            --strength: #ef4444;
-            --spirit: #10b981;
-            --brain: #3b82f6;
-            --recovery: #8b5cf6;
-            --joy: #f59e0b;
-            --willpower: #ec4899;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-        }
+    --bg-dark: #0a0e1a;
+    --glass-bg: rgba(20, 25, 45, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --accent: #00d9ff;
+    --secondary: #a855f7;
+    --primary: #3b82f6;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --strength: #ff6b6b;
+    --spirit: #4ecdc4;
+    --brain: #45b7d1;
+    --recovery: #9b59b6;
+    --joy: #ffa94d;
+    --willpower: #fd79a8;
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+}
         * { margin: 0; padding: 0; box-sizing: border-box; }
         @keyframes gradientShift {
             0% { background-position: 0% 50%; }
@@ -78,16 +82,16 @@
             z-index: 0;
         }
         .hero {
-            position: relative;
-            min-height: 60vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 60px 20px;
-            overflow: hidden;
-        }
+    position: relative;
+    min-height: 50vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px 60px;
+    overflow: hidden;
+}
         .hero::before {
             content: '';
             position: absolute;
@@ -106,16 +110,22 @@
             max-width: 1200px;
         }
         .hero-title {
-            font-size: 5em;
-            font-weight: 900;
-            background: linear-gradient(135deg, var(--accent), var(--secondary), var(--strength));
-            background-size: 200% 200%;
-            animation: gradientShift 5s ease infinite;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 20px;
-            line-height: 1.2;
-        }
+    font-size: 4em;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), var(--secondary), var(--primary));
+    background-size: 200% 200%;
+    animation: gradientShift 5s ease infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 15px;
+    line-height: 1.1;
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5em;
+    }
+}
         .hero-subtitle {
             font-size: 1.5em;
             color: var(--text-muted);
@@ -724,6 +734,201 @@
             background: linear-gradient(180deg, var(--accent), var(--secondary));
             border-radius: 10px;
         }
+        /* Quest System */
+.quest-section {
+    margin-bottom: 25px;
+}
+.quest-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.quest-header:hover {
+    background: rgba(0, 0, 0, 0.5);
+}
+.quest-difficulty {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 700;
+}
+.quest-easy { background: linear-gradient(135deg, #10b981, #059669); }
+.quest-medium { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.quest-hard { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.quest-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.quest-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    border-left: 3px solid;
+    transition: all 0.3s;
+}
+.quest-item:hover {
+    background: rgba(0, 0, 0, 0.4);
+    transform: translateX(5px);
+}
+.quest-item.completed {
+    opacity: 0.5;
+    text-decoration: line-through;
+}
+.quest-reward {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: var(--warning);
+}
+
+/* Level & XP System */
+.level-card {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.level-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--accent), var(--secondary));
+    opacity: 0.1;
+}
+.level-number {
+    font-size: 4em;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), var(--secondary), var(--warning));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+}
+.xp-bar-container {
+    margin-top: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50px;
+    height: 30px;
+    overflow: hidden;
+    position: relative;
+}
+.xp-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--secondary), var(--warning));
+    border-radius: 50px;
+    transition: width 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 15px;
+    font-weight: 700;
+    font-size: 0.85em;
+}
+
+/* Currency & Shop */
+.currency-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.1em;
+}
+.coin-icon {
+    color: var(--warning);
+    font-size: 1.3em;
+    animation: float 2s ease-in-out infinite;
+}
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+}
+.shop-item {
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid var(--glass-border);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.shop-item:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent);
+    box-shadow: 0 5px 20px rgba(0, 217, 255, 0.3);
+}
+.shop-item.owned {
+    border-color: var(--success);
+    opacity: 0.6;
+}
+.shop-item-icon {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
+.shop-item-price {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 10px;
+    font-weight: 700;
+    color: var(--warning);
+}
+.character-display {
+    font-size: 8em;
+    margin: 20px 0;
+    text-align: center;
+    filter: drop-shadow(0 0 20px currentColor);
+}
+
+/* Daily Rewards */
+.reward-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+}
+.reward-day {
+    aspect-ratio: 1;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid var(--glass-border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.reward-day:hover {
+    transform: scale(1.05);
+}
+.reward-day.claimed {
+    border-color: var(--success);
+    background: rgba(16, 185, 129, 0.2);
+}
+.reward-day.available {
+    border-color: var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+}
     </style>
 </head>
 <body>
@@ -767,6 +972,78 @@
                 <div class="streak-badge">🔥 <span id="dayStreak">0</span> Day Streak</div>
             </div>
         </div>
+        <!-- Level & Currency Display -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 40px;">
+    <div class="card level-card">
+        <div style="position: relative;">
+            <div style="font-size: 0.9em; color: var(--text-muted); margin-bottom: 10px;">LEVEL</div>
+            <div class="level-number" id="playerLevel">1</div>
+            <div class="xp-bar-container">
+                <div class="xp-bar" id="xpBar" style="width: 0%;">
+                    <span id="xpText">0/100</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div class="currency-display" style="display: inline-flex;">
+                <span class="coin-icon">💰</span>
+                <span id="coinAmount">0</span>
+                <span style="color: var(--text-muted);">Coins</span>
+            </div>
+        </div>
+        <div class="character-display" id="characterDisplay">🧑</div>
+        <button class="btn btn-primary" onclick="openModal('shop')" style="width: 100%;">
+            <i class="fa-solid fa-store"></i> Open Shop
+        </button>
+    </div>
+</div>
+
+<!-- Daily Quests -->
+<div class="card" style="margin-bottom: 40px;">
+    <div class="card-title"><i class="fa-solid fa-scroll"></i> Daily Quests</div>
+    
+    <div class="quest-section">
+        <div class="quest-header" onclick="toggleQuests('easy')">
+            <div>
+                <span class="quest-difficulty quest-easy">⭐ EASY</span>
+                <span style="margin-left: 15px; color: var(--text-muted);">Complete 3/3 for bonus</span>
+            </div>
+            <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="quest-list" id="questsEasy"></div>
+    </div>
+    
+    <div class="quest-section">
+        <div class="quest-header" onclick="toggleQuests('medium')">
+            <div>
+                <span class="quest-difficulty quest-medium">⭐⭐ MEDIUM</span>
+                <span style="margin-left: 15px; color: var(--text-muted);">Complete 3/3 for bonus</span>
+            </div>
+            <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="quest-list" id="questsMedium"></div>
+    </div>
+    
+    <div class="quest-section">
+        <div class="quest-header" onclick="toggleQuests('hard')">
+            <div>
+                <span class="quest-difficulty quest-hard">⭐⭐⭐ HARD</span>
+                <span style="margin-left: 15px; color: var(--text-muted);">Complete 3/3 for bonus</span>
+            </div>
+            <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="quest-list" id="questsHard"></div>
+    </div>
+</div>
+
+<!-- Daily Rewards -->
+<div class="card" style="margin-bottom: 40px;">
+    <div class="card-title"><i class="fa-solid fa-gift"></i> Daily Login Rewards</div>
+    <div class="reward-grid" id="dailyRewards"></div>
+</div>
 
         <div class="main-grid" id="tracker">
             <div>
@@ -1106,499 +1383,771 @@
             </div>
         </div>
     </div>
+        <div class="modal" id="shopModal">
+    <div class="modal-content" style="max-width: 900px;">
+        <h2><i class="fa-solid fa-store"></i> Shop</h2>
+        <div class="currency-display" style="justify-content: center; margin-bottom: 25px;">
+            <span class="coin-icon">💰</span>
+            <span id="shopCoinAmount">0</span>
+            <span style="color: var(--text-muted);">Coins</span>
+        </div>
+        
+        <div class="tabs" style="margin-bottom: 25px;">
+            <button class="tab active" onclick="switchShopTab('characters')">Characters</button>
+            <button class="tab" onclick="switchShopTab('weapons')">Weapons</button>
+        </div>
+        
+        <div id="shopCharacters" class="shop-grid"></div>
+        <div id="shopWeapons" class="shop-grid" style="display: none;"></div>
+        
+        <button class="btn btn-secondary" onclick="closeModal()" style="width: 100%; margin-top: 25px;">Close</button>
+    </div>
+</div>
 
     <script>
-        let appData = {
-            today: new Date().toDateString(),
-            hexagon: { STR: 0, SPR: 0, INT: 0, REC: 0, JOY: 0, WIL: 0 },
-            routine: [
-                { id: 'bed', text: '🛏️ Make your bed', done: false },
-                { id: 'water', text: '💧 Drink 2L water', done: false },
-                { id: 'skincare', text: '✨ Skincare', done: false },
-                { id: 'shower', text: '🚿 Morning shower', done: false }
-            ],
-            kohi: [
-                { id: 'vocab', text: '📝 Vocabulary', done: false },
-                { id: 'kanji', text: '㊗️ Kanji', done: false },
-                { id: 'grammar', text: '📖 Grammar', done: false }
-            ],
-            logs: [],
-            streak: 1,
-            lastActive: new Date().toDateString(),
-            selectedRating: null,
-            selectedRatingValue: 0
-        };
+        
+let appData = {
+    today: new Date().toDateString(),
+    hexagon: { STR: 0, SPR: 0, INT: 0, REC: 0, JOY: 0, WIL: 0 },
+    routine: [
+        { id: 'bed', text: '🛏️ Make your bed', done: false },
+        { id: 'water', text: '💧 Drink 2L water', done: false },
+        { id: 'skincare', text: '✨ Skincare', done: false },
+        { id: 'shower', text: '🚿 Morning shower', done: false }
+    ],
+    kohi: [
+        { id: 'vocab', text: '📝 Vocabulary', done: false },
+        { id: 'kanji', text: '㊗️ Kanji', done: false },
+        { id: 'grammar', text: '📖 Grammar', done: false }
+    ],
+    logs: [],
+    streak: 1,
+    lastActive: new Date().toDateString(),
+    selectedRating: null,
+    selectedRatingValue: 0,
+    level: 1,
+    xp: 0,
+    xpToNext: 100,
+    coins: 0,
+    quests: { easy: [], medium: [], hard: [] },
+    inventory: { characters: ['🧑'], weapons: [], equipped: { character: '🧑', weapon: null } },
+    dailyRewards: Array(7).fill(false),
+    lastRewardClaim: null
+};
 
-        let hexagonChart, timerInterval;
-        let timerMinutes = 25, timerSeconds = 0, timerRunning = false;
+const QUEST_TEMPLATES = {
+    easy: [
+        { text: 'Complete morning routine', reward: 20, type: 'routine' },
+        { text: 'Study for 15 minutes', reward: 25, type: 'study' },
+        { text: 'Drink 2L water', reward: 15, type: 'water' },
+        { text: 'Do 10 push-ups', reward: 20, type: 'exercise' },
+        { text: 'Read for 10 minutes', reward: 20, type: 'reading' },
+        { text: 'Meditate for 5 minutes', reward: 25, type: 'meditation' }
+    ],
+    medium: [
+        { text: 'Complete a workout session', reward: 50, type: 'gym' },
+        { text: 'Study for 45 minutes', reward: 60, type: 'study' },
+        { text: 'Practice Japanese for 30 min', reward: 55, type: 'kohi' },
+        { text: 'Write a blog post idea', reward: 50, type: 'creative' },
+        { text: 'Complete gratitude journal', reward: 45, type: 'soul' }
+    ],
+    hard: [
+        { text: 'Complete 2 hour deep work session', reward: 100, type: 'study' },
+        { text: 'Finish full workout program', reward: 120, type: 'gym' },
+        { text: 'No phone before 10 AM', reward: 100, type: 'willpower' },
+        { text: 'Complete all daily tasks', reward: 150, type: 'all' },
+        { text: 'Sleep before 11 PM', reward: 100, type: 'sleep' }
+    ]
+};
 
-        function init() {
-            loadData();
-            updateDate();
-            renderRoutine();
-            renderKohi();
-            initHexagonChart();
-            updateAllStats();
-            renderLogs();
-            createParticles();
-            document.getElementById('sleepTime').addEventListener('input', updateSleepPreview);
-            updateSleepPreview();
+const SHOP_ITEMS = {
+    characters: [
+        { id: 'warrior', icon: '⚔️', name: 'Warrior', price: 100 },
+        { id: 'mage', icon: '🧙', name: 'Mage', price: 150 },
+        { id: 'ninja', icon: '🥷', name: 'Ninja', price: 200 },
+        { id: 'robot', icon: '🤖', name: 'Robot', price: 250 },
+        { id: 'alien', icon: '👽', name: 'Alien', price: 300 },
+        { id: 'superhero', icon: '🦸', name: 'Superhero', price: 500 }
+    ],
+    weapons: [
+        { id: 'sword', icon: '⚔️', name: 'Sword', price: 80 },
+        { id: 'bow', icon: '🏹', name: 'Bow', price: 100 },
+        { id: 'staff', icon: '🪄', name: 'Magic Staff', price: 120 },
+        { id: 'hammer', icon: '🔨', name: 'Hammer', price: 150 },
+        { id: 'shield', icon: '🛡️', name: 'Shield', price: 200 }
+    ]
+};
+
+let hexagonChart, timerInterval;
+let timerMinutes = 25, timerSeconds = 0, timerRunning = false;
+
+function init() {
+    loadData();
+    updateDate();
+    generateDailyQuests();
+    renderRoutine();
+    renderKohi();
+    initHexagonChart();
+    updateAllStats();
+    renderLogs();
+    createParticles();
+    renderQuests();
+    updateLevelDisplay();
+    renderDailyRewards();
+    renderShop();
+    updateCharacterDisplay();
+    document.getElementById('sleepTime').addEventListener('input', updateSleepPreview);
+    updateSleepPreview();
+}
+
+function createParticles() {
+    for (let i = 0; i < 30; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.top = Math.random() * 100 + '%';
+        p.style.animation = `float ${Math.random() * 10 + 5}s ease-in-out infinite`;
+        p.style.animationDelay = Math.random() * 5 + 's';
+        document.body.appendChild(p);
+    }
+}
+
+function loadData() {
+    const saved = localStorage.getItem('hexagonOS');
+    if (saved) {
+        const data = JSON.parse(saved);
+        if (data.today !== new Date().toDateString()) {
+            const daysDiff = Math.floor((new Date() - new Date(data.lastActive)) / (1000 * 60 * 60 * 24));
+            appData.streak = daysDiff === 1 ? data.streak + 1 : 1;
+            appData.routine.forEach(r => r.done = false);
+            appData.kohi.forEach(k => k.done = false);
+            appData.hexagon = { STR: 0, SPR: 0, INT: 0, REC: 0, JOY: 0, WIL: 0 };
+            appData.logs = data.logs || [];
+            appData.level = data.level || 1;
+            appData.xp = data.xp || 0;
+            appData.xpToNext = data.xpToNext || 100;
+            appData.coins = data.coins || 0;
+            appData.inventory = data.inventory || { characters: ['🧑'], weapons: [], equipped: { character: '🧑', weapon: null } };
+            appData.dailyRewards = data.dailyRewards || Array(7).fill(false);
+            appData.quests = { easy: [], medium: [], hard: [] };
+        } else {
+            appData = { ...appData, ...data };
         }
+    }
+}
 
-        function createParticles() {
-            for (let i = 0; i < 30; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                p.style.left = Math.random() * 100 + '%';
-                p.style.top = Math.random() * 100 + '%';
-                p.style.animation = `float ${Math.random() * 10 + 5}s ease-in-out infinite`;
-                p.style.animationDelay = Math.random() * 5 + 's';
-                document.body.appendChild(p);
+function saveData() {
+    appData.today = new Date().toDateString();
+    localStorage.setItem('hexagonOS', JSON.stringify(appData));
+}
+
+function generateDailyQuests() {
+    if (!appData.quests.easy.length) {
+        ['easy', 'medium', 'hard'].forEach(diff => {
+            appData.quests[diff] = [];
+            for (let i = 0; i < 3; i++) {
+                const templates = QUEST_TEMPLATES[diff];
+                const quest = templates[Math.floor(Math.random() * templates.length)];
+                appData.quests[diff].push({ ...quest, completed: false, id: Date.now() + i });
             }
-        }
+        });
+        saveData();
+    }
+}
 
-        function loadData() {
-            const saved = localStorage.getItem('hexagonOS');
-            if (saved) {
-                const data = JSON.parse(saved);
-                if (data.today !== new Date().toDateString()) {
-                    const daysDiff = Math.floor((new Date() - new Date(data.lastActive)) / (1000 * 60 * 60 * 24));
-                    appData.streak = daysDiff === 1 ? data.streak + 1 : 1;
-                    appData.routine.forEach(r => r.done = false);
-                    appData.kohi.forEach(k => k.done = false);
-                    appData.hexagon = { STR: 0, SPR: 0, INT: 0, REC: 0, JOY: 0, WIL: 0 };
-                    appData.logs = data.logs || [];
-                } else {
-                    appData = { ...appData, ...data };
-                }
-            }
-        }
-
-        function saveData() {
-            appData.today = new Date().toDateString();
-            localStorage.setItem('hexagonOS', JSON.stringify(appData));
-        }
-
-        function updateDate() {
-            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            document.getElementById('dayStreak').textContent = appData.streak;
-        }
-
-        function renderRoutine() {
-            document.getElementById('routineList').innerHTML = appData.routine.map(item => `
-                <div class="check-item ${item.done ? 'completed' : ''}" onclick="toggleRoutine('${item.id}')">
-                    <div class="checkbox">${item.done ? '<i class="fa-solid fa-check"></i>' : ''}</div>
-                    <span>${item.text}</span>
+function renderQuests() {
+    ['easy', 'medium', 'hard'].forEach(diff => {
+        const container = document.getElementById(`quests${diff.charAt(0).toUpperCase() + diff.slice(1)}`);
+        if (!container) return;
+        container.innerHTML = appData.quests[diff].map(quest => `
+            <div class="quest-item ${quest.completed ? 'completed' : ''}" 
+                 style="border-left-color: var(--${diff === 'easy' ? 'success' : diff === 'medium' ? 'warning' : 'danger'});"
+                 onclick="completeQuest('${diff}', ${quest.id})">
+                <div>
+                    <div>${quest.completed ? '✓' : '○'} ${quest.text}</div>
                 </div>
-            `).join('');
-            document.getElementById('routineProgress').textContent = Math.round((appData.routine.filter(r => r.done).length / appData.routine.length) * 100) + '%';
-        }
-
-        function toggleRoutine(id) {
-            appData.routine.find(r => r.id === id).done = !appData.routine.find(r => r.id === id).done;
-            renderRoutine();
-            saveData();
-        }
-
-        function renderKohi() {
-            document.getElementById('kohiList').innerHTML = appData.kohi.map(item => `
-                <div class="check-item ${item.done ? 'completed' : ''}" onclick="toggleKohi('${item.id}')">
-                    <div class="checkbox">${item.done ? '<i class="fa-solid fa-check"></i>' : ''}</div>
-                    <span>${item.text}</span>
+                <div class="quest-reward">
+                    <span>+${quest.reward}</span>
+                    <i class="fa-solid fa-star"></i>
                 </div>
-            `).join('');
-        }
-
-        function toggleKohi(id) {
-            appData.kohi.find(k => k.id === id).done = !appData.kohi.find(k => k.id === id).done;
-            appData.hexagon.INT = Math.max(appData.hexagon.INT, appData.kohi.filter(k => k.done).length * 15);
-            renderKohi();
-            updateHexagonChart();
-            saveData();
-        }
-
-        function initHexagonChart() {
-            hexagonChart = new Chart(document.getElementById('hexagonChart'), {
-                type: 'radar',
-                data: {
-                    labels: ['Strength', 'Spirit', 'Brain', 'Recovery', 'Joy', 'Willpower'],
-                    datasets: [{
-                        data: Object.values(appData.hexagon),
-                        backgroundColor: 'rgba(0, 217, 255, 0.3)',
-                        borderColor: '#00d9ff',
-                        borderWidth: 4,
-                        pointBackgroundColor: ['#ef4444', '#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ec4899'],
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 3,
-                        pointRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    scales: {
-                        r: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: { stepSize: 20, color: '#94a3b8', backdropColor: 'transparent' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                            pointLabels: { color: '#f1f5f9', font: { size: 14, weight: 'bold' } }
-                        }
-                    },
-                    plugins: { legend: { display: false } }
-                }
-            });
-        }
-
-        function updateHexagonChart() {
-            hexagonChart.data.datasets[0].data = Object.values(appData.hexagon);
-            hexagonChart.update();
-            const total = Object.values(appData.hexagon).reduce((a, b) => a + b, 0);
-            document.getElementById('totalScore').textContent = total;
-            const avg = total / 6;
-            let grade = 'E', gradeClass = 'grade-E';
-            if (avg >= 90) { grade = 'S'; gradeClass = 'grade-S'; }
-            else if (avg >= 80) { grade = 'A'; gradeClass = 'grade-A'; }
-            else if (avg >= 70) { grade = 'B'; gradeClass = 'grade-B'; }
-            else if (avg >= 50) { grade = 'C'; gradeClass = 'grade-C'; }
-            else if (avg >= 30) { grade = 'D'; gradeClass = 'grade-D'; }
-            const gradeEl = document.getElementById('gradeDisplay');
-            gradeEl.textContent = grade;
-            gradeEl.className = 'grade-letter ' + gradeClass;
-            updateAllStats();
-        }
-
-        function updateAllStats() {
-            document.getElementById('statSTR').textContent = appData.hexagon.STR;
-            document.getElementById('statSPR').textContent = appData.hexagon.SPR;
-            document.getElementById('statINT').textContent = appData.hexagon.INT;
-            document.getElementById('statREC').textContent = appData.hexagon.REC;
-            document.getElementById('statJOY').textContent = appData.hexagon.JOY;
-            document.getElementById('statWIL').textContent = appData.hexagon.WIL;
-        }
-
-        function startTimer() {
-            if (timerRunning) return;
-            timerRunning = true;
-            timerInterval = setInterval(() => {
-                if (timerSeconds === 0) {
-                    if (timerMinutes === 0) {
-                        clearInterval(timerInterval);
-                        timerRunning = false;
-                        alert('⏰ Time up! 🎉');
-                        return;
-                    }
-                    timerMinutes--;
-                    timerSeconds = 59;
-                } else {
-                    timerSeconds--;
-                }
-                updateTimerDisplay();
-            }, 1000);
-        }
-
-        function pauseTimer() {
-            clearInterval(timerInterval);
-            timerRunning = false;
-        }
-
-        function resetTimer() {
-            clearInterval(timerInterval);
-            timerRunning = false;
-            timerMinutes = parseInt(document.getElementById('timerMode').value);
-            timerSeconds = 0;
-            updateTimerDisplay();
-        }
-
-        function changeTimerMode() {
-            resetTimer();
-        }
-
-        function updateTimerDisplay() {
-            document.getElementById('timerDisplay').textContent = `${String(timerMinutes).padStart(2, '0')}:${String(timerSeconds).padStart(2, '0')}`;
-        }
-
-        function selectRating(grade, value) {
-            document.querySelectorAll('.rating-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            appData.selectedRating = grade;
-            appData.selectedRatingValue = value;
-        }
-
-        function openModal(type) {
-            closeModal();
-            appData.selectedRating = null;
-            appData.selectedRatingValue = 0;
-            document.querySelectorAll('.rating-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(type + 'Modal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
-        }
-
-        function toggleWillpower(element) {
-            element.classList.toggle('completed');
-        }
-
-        function updateSleepPreview() {
-            const time = document.getElementById('sleepTime').value;
-            if (!time) return;
-            const [hours, minutes] = time.split(':').map(Number);
-            let score = 0;
-            if (hours < 23) score = 100;
-            else if (hours === 23) score = 100 - Math.round(minutes * 0.33);
-            else if (hours === 0) score = 80 - Math.round(minutes * 0.33);
-            else if (hours === 1) score = 60 - Math.round(minutes * 0.5);
-            else if (hours === 2) score = 30 - Math.round(minutes * 0.5);
-            else if (hours >= 3 && hours < 12) score = 10;
-            else score = 100;
-            document.getElementById('sleepScorePreview').textContent = Math.max(0, Math.min(100, score));
-            }
-      function saveStudyLog() {
-        const subject = document.getElementById('studySubject').options[document.getElementById('studySubject').selectedIndex].text;
-        const topic = document.getElementById('studyTopic').value;
-        const duration = document.getElementById('studyDuration').value;
-        const location = document.getElementById('studyLocation').value;
-        const notes = document.getElementById('studyNotes').value;
-
-        if (!topic || !duration || !appData.selectedRating) {
-            alert('Please fill all fields and rate!');
-            return;
-        }
-
-        appData.hexagon.INT = Math.min(100, appData.hexagon.INT + appData.selectedRatingValue);
-        appData.logs.unshift({
-            type: 'study',
-            timestamp: new Date().toLocaleString('vi-VN'),
-            data: { subject, topic, duration, location, notes, rating: appData.selectedRating, score: appData.selectedRatingValue }
-        });
-
-        document.getElementById('studyTopic').value = '';
-        document.getElementById('studyDuration').value = '';
-        document.getElementById('studyLocation').value = '';
-        document.getElementById('studyNotes').value = '';
-
-        updateHexagonChart();
-        renderLogs();
-        saveData();
-        closeModal();
-        showNotification(`+${appData.selectedRatingValue} Brain! 📚`, 'linear-gradient(135deg, var(--brain), #2563eb)');
-    }
-
-    function saveGymLog() {
-        const gymDay = document.getElementById('gymDay').options[document.getElementById('gymDay').selectedIndex].text;
-        const exercises = document.getElementById('gymExercises').value;
-        const duration = document.getElementById('gymDuration').value;
-
-        if (!exercises || !duration || !appData.selectedRating) {
-            alert('Please fill all fields and rate!');
-            return;
-        }
-
-        appData.hexagon.STR = Math.min(100, appData.hexagon.STR + appData.selectedRatingValue);
-        appData.logs.unshift({
-            type: 'gym',
-            timestamp: new Date().toLocaleString('vi-VN'),
-            data: { gymDay, exercises, duration, rating: appData.selectedRating, score: appData.selectedRatingValue }
-        });
-
-        document.getElementById('gymExercises').value = '';
-        document.getElementById('gymDuration').value = '';
-
-        updateHexagonChart();
-        renderLogs();
-        saveData();
-        closeModal();
-        showNotification(`+${appData.selectedRatingValue} Strength! 💪`, 'linear-gradient(135deg, var(--strength), #dc2626)');
-    }
-
-    function saveSoulLog() {
-        const g1 = document.getElementById('gratitude1').value;
-        const g2 = document.getElementById('gratitude2').value;
-        const g3 = document.getElementById('gratitude3').value;
-        const meditation = document.getElementById('meditationNotes').value;
-
-        if (!g1 || !g2 || !g3) {
-            alert('Write 3 gratitude items!');
-            return;
-        }
-
-        const bonus = meditation ? 50 : 30;
-        appData.hexagon.SPR = Math.min(100, appData.hexagon.SPR + bonus);
-        appData.logs.unshift({
-            type: 'soul',
-            timestamp: new Date().toLocaleString('vi-VN'),
-            data: { gratitude: [g1, g2, g3], meditation }
-        });
-
-        document.getElementById('gratitude1').value = '';
-        document.getElementById('gratitude2').value = '';
-        document.getElementById('gratitude3').value = '';
-        document.getElementById('meditationNotes').value = '';
-
-        updateHexagonChart();
-        renderLogs();
-        saveData();
-        closeModal();
-        showNotification(`+${bonus} Spirit! 🙏`, 'linear-gradient(135deg, var(--spirit), #059669)');
-    }
-
-    function saveJoyLog() {
-        const type = document.getElementById('joyType').options[document.getElementById('joyType').selectedIndex].text;
-        const title = document.getElementById('joyTitle').value;
-        const content = document.getElementById('joyContent').value;
-
-        if (!title || !content) {
-            alert('Fill all fields!');
-            return;
-        }
-
-        appData.hexagon.JOY = Math.min(100, appData.hexagon.JOY + 40);
-        appData.logs.unshift({
-            type: 'joy',
-            timestamp: new Date().toLocaleString('vi-VN'),
-            data: { type, title, content }
-        });
-
-        document.getElementById('joyTitle').value = '';
-        document.getElementById('joyContent').value = '';
-
-        updateHexagonChart();
-        renderLogs();
-        saveData();
-        closeModal();
-        showNotification('+40 Joy! ✨', 'linear-gradient(135deg, var(--joy), #ea580c)');
-    }
-
-    function saveWillpowerCheck() {
-        const checks = document.querySelectorAll('#willpowerModal .check-item.completed');
-        if (checks.length === 0) {
-            alert('Select at least 1!');
-            return;
-        }
-
-        const bonus = checks.length * 25;
-        appData.hexagon.WIL = Math.min(100, appData.hexagon.WIL + bonus);
-        const items = Array.from(checks).map(c => c.querySelector('strong').textContent);
-
-        appData.logs.unshift({
-            type: 'willpower',
-            timestamp: new Date().toLocaleString('vi-VN'),
-            data: { count: checks.length, items }
-        });
-
-        checks.forEach(c => c.classList.remove('completed'));
-
-        updateHexagonChart();
-        renderLogs();
-        saveData();
-        closeModal();
-        showNotification(`+${bonus} Willpower! 🛡️`, 'linear-gradient(135deg, var(--willpower), #db2777)');
-    }
-
-    function saveSleepLog() {
-        const time = document.getElementById('sleepTime').value;
-        if (!time) {
-            alert('Select sleep time!');
-            return;
-        }
-
-        const [hours, minutes] = time.split(':').map(Number);
-        let score = 0;
-        if (hours < 23) score = 100;
-        else if (hours === 23) score = 100 - Math.round(minutes * 0.33);
-        else if (hours === 0) score = 80 - Math.round(minutes * 0.33);
-        else if (hours === 1) score = 60 - Math.round(minutes * 0.5);
-        else if (hours === 2) score = 30 - Math.round(minutes * 0.5);
-        else if (hours >= 3 && hours < 12) score = 10;
-        else score = 100;
-
-        score = Math.max(0, Math.min(100, score));
-        appData.hexagon.REC = score;
-
-        appData.logs.unshift({
-            type: 'sleep',
-            timestamp: new Date().toLocaleString('vi-VN'),
-            data: { time, score }
-        });
-
-        updateHexagonChart();
-        renderLogs();
-        saveData();
-        closeModal();
-        showNotification(`+${score} Recovery! 🌙`, 'linear-gradient(135deg, var(--recovery), #7c3aed)');
-    }
-
-    function renderLogs(filter = 'all') {
-        let logs = appData.logs;
-        if (filter !== 'all') logs = logs.filter(l => l.type === filter);
-
-        if (logs.length === 0) {
-            document.getElementById('logsContainer').innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 60px;">No logs yet! 🚀</div>';
-            return;
-        }
-
-        document.getElementById('logsContainer').innerHTML = logs.slice(0, 30).map(log => {
-            let content = '', borderColor = 'var(--accent)';
-            
-            if (log.type === 'study') {
-                borderColor = 'var(--brain)';
-                content = `<strong>📚 ${log.data.subject} - ${log.data.topic}</strong><br>
-                    <div style="margin-top: 8px; color: var(--text-muted);">⏱️ ${log.data.duration}min • 📍 ${log.data.location} • 
-                    <span style="color: var(--brain); font-weight: 700;">Grade: ${log.data.rating}</span> (+${log.data.score})</div>
-                    ${log.data.notes ? `<div style="margin-top: 10px; font-style: italic;">"${log.data.notes}"</div>` : ''}`;
-            } else if (log.type === 'gym') {
-                borderColor = 'var(--strength)';
-                content = `<strong>💪 ${log.data.gymDay}</strong><br>
-                    <div style="margin-top: 8px; color: var(--text-muted);">⏱️ ${log.data.duration}min • 
-                    <span style="color: var(--strength); font-weight: 700;">Grade: ${log.data.rating}</span> (+${log.data.score})</div>
-                    <pre style="margin-top: 10px; color: var(--text-muted); white-space: pre-wrap; font-family: inherit;">${log.data.exercises}</pre>`;
-            } else if (log.type === 'soul') {
-                borderColor = 'var(--spirit)';
-                content = `<strong>🙏 Gratitude</strong><br>
-                    <ul style="margin-top: 10px; padding-left: 20px; line-height: 1.8;">${log.data.gratitude.map(i => `<li>${i}</li>`).join('')}</ul>
-                    ${log.data.meditation ? `<div style="margin-top: 10px; font-style: italic;">🧘 ${log.data.meditation}</div>` : ''}`;
-            } else if (log.type === 'joy') {
-                borderColor = 'var(--joy)';
-                content = `<strong>✨ ${log.data.type} - ${log.data.title}</strong><br>
-                    <div style="margin-top: 10px; line-height: 1.6;">${log.data.content}</div>`;
-            } else if (log.type === 'willpower') {
-                borderColor = 'var(--willpower)';
-                content = `<strong>🛡️ Willpower (${log.data.count}/4)</strong><br>
-                    <ul style="margin-top: 10px; padding-left: 20px; line-height: 1.8;">${log.data.items.map(i => `<li>${i}</li>`).join('')}</ul>`;
-            } else if (log.type === 'sleep') {
-                borderColor = 'var(--recovery)';
-                content = `<strong>🌙 Bedtime: ${log.data.time}</strong><br>
-                    <div style="margin-top: 8px;"><span style="color: var(--recovery); font-weight: 700;">Score: ${log.data.score}/100</span></div>`;
-            }
-
-            return `<div class="log-item" style="border-left-color: ${borderColor};">
-                <div class="log-time">${log.timestamp}</div>${content}</div>`;
-        }).join('');
-    }
-
-    function switchLogTab(filter) {
-        document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
-        event.target.classList.add('active');
-        renderLogs(filter);
-    }
-
-    function showNotification(text, gradient) {
-        const notif = document.createElement('div');
-        notif.className = 'notification';
-        notif.style.background = gradient;
-        notif.textContent = text;
-        document.body.appendChild(notif);
-        setTimeout(() => notif.remove(), 3000);
-    }
-
-    init();
-    setInterval(saveData, 30000);
-    document.querySelectorAll('.modal').forEach(m => {
-        m.addEventListener('click', e => { if (e.target === m) closeModal(); });
+            </div>
+        `).join('');
     });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+}
+
+function completeQuest(difficulty, questId) {
+    const quest = appData.quests[difficulty].find(q => q.id === questId);
+    if (!quest || quest.completed) return;
+    
+    quest.completed = true;
+    addXP(quest.reward);
+    
+    const allCompleted = appData.quests[difficulty].every(q => q.completed);
+    if (allCompleted) {
+        const bonus = difficulty === 'easy' ? 50 : difficulty === 'medium' ? 100 : 200;
+        addXP(bonus);
+        showNotification(`🎉 ${difficulty.toUpperCase()} quests completed! +${bonus} bonus XP!`, 'linear-gradient(135deg, var(--accent), var(--secondary))');
+    }
+    
+    renderQuests();
+    saveData();
+}
+
+function toggleQuests(difficulty) {
+    const list = document.getElementById(`quests${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}`);
+    if (!list) return;
+    list.style.display = list.style.display === 'none' ? 'flex' : 'none';
+}
+
+function addXP(amount) {
+    appData.xp += amount;
+    appData.coins += Math.floor(amount / 2);
+    
+    while (appData.xp >= appData.xpToNext) {
+        appData.xp -= appData.xpToNext;
+        appData.level++;
+        appData.xpToNext = Math.floor(appData.xpToNext * 1.5);
+        showNotification(`🎊 LEVEL UP! You are now level ${appData.level}!`, 'linear-gradient(135deg, #fbbf24, #f59e0b, #ef4444)');
+    }
+    
+    updateLevelDisplay();
+    saveData();
+}
+
+function updateLevelDisplay() {
+    if (document.getElementById('playerLevel')) {
+        document.getElementById('playerLevel').textContent = appData.level;
+        document.getElementById('xpText').textContent = `${appData.xp}/${appData.xpToNext}`;
+        document.getElementById('xpBar').style.width = `${(appData.xp / appData.xpToNext) * 100}%`;
+        document.getElementById('coinAmount').textContent = appData.coins;
+    }
+    if (document.getElementById('shopCoinAmount')) {
+        document.getElementById('shopCoinAmount').textContent = appData.coins;
+    }
+}
+
+function renderDailyRewards() {
+    const container = document.getElementById('dailyRewards');
+    if (!container) return;
+    const today = new Date().toDateString();
+    const canClaim = appData.lastRewardClaim !== today;
+    const nextDay = appData.dailyRewards.findIndex(r => !r);
+    
+    container.innerHTML = appData.dailyRewards.map((claimed, i) => {
+        const reward = (i + 1) * 50;
+        const isAvailable = canClaim && i === nextDay;
+        return `
+            <div class="reward-day ${claimed ? 'claimed' : ''} ${isAvailable ? 'available' : ''}"
+                 onclick="${isAvailable ? `claimDailyReward(${i}, ${reward})` : ''}">
+                <div style="font-weight: 700;">Day ${i + 1}</div>
+                <div style="font-size: 1.5em; margin: 5px 0;">${claimed ? '✓' : '💰'}</div>
+                <div style="font-size: 0.8em; color: var(--warning);">${reward}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+function claimDailyReward(day, reward) {
+    appData.dailyRewards[day] = true;
+    appData.lastRewardClaim = new Date().toDateString();
+    appData.coins += reward;
+    
+    if (appData.dailyRewards.every(r => r)) {
+        appData.coins += 500;
+        showNotification('🎉 Week completed! +500 bonus coins!', 'linear-gradient(135deg, var(--warning), var(--danger))');
+        appData.dailyRewards = Array(7).fill(false);
+    }
+    
+    updateLevelDisplay();
+    renderDailyRewards();
+    saveData();
+    showNotification(`Claimed ${reward} coins! 💰`, 'linear-gradient(135deg, var(--warning), var(--secondary))');
+}
+
+function renderShop() {
+    const charContainer = document.getElementById('shopCharacters');
+    const weaponContainer = document.getElementById('shopWeapons');
+    if (!charContainer || !weaponContainer) return;
+    
+    charContainer.innerHTML = SHOP_ITEMS.characters.map(item => {
+        const owned = appData.inventory.characters.includes(item.icon);
+        return `
+            <div class="shop-item ${owned ? 'owned' : ''}" 
+                 onclick="${owned ? '' : `buyItem('characters', '${item.id}')`}">
+                <div class="shop-item-icon">${item.icon}</div>
+                <div style="font-weight: 700; margin-bottom: 5px;">${item.name}</div>
+                <div class="shop-item-price">
+                    ${owned ? '✓ Owned' : `<span>${item.price}</span> <i class="fa-solid fa-coins"></i>`}
+                </div>
+                ${owned ? `<button class="btn btn-primary" style="margin-top: 10px; width: 100%; padding: 8px;" onclick="event.stopPropagation(); equipItem('character', '${item.icon}')">Equip</button>` : ''}
+            </div>
+        `;
+    }).join('');
+    
+    weaponContainer.innerHTML = SHOP_ITEMS.weapons.map(item => {
+        const owned = appData.inventory.weapons.includes(item.icon);
+        return `
+            <div class="shop-item ${owned ? 'owned' : ''}" 
+                 onclick="${owned ? '' : `buyItem('weapons', '${item.id}')`}">
+                <div class="shop-item-icon">${item.icon}</div>
+                <div style="font-weight: 700; margin-bottom: 5px;">${item.name}</div>
+                <div class="shop-item-price">
+                    ${owned ? '✓ Owned' : `<span>${item.price}</span> <i class="fa-solid fa-coins"></i>`}
+                </div>
+                ${owned ? `<button class="btn btn-primary" style="margin-top: 10px; width: 100%; padding: 8px;" onclick="event.stopPropagation(); equipItem('weapon', '${item.icon}')">Equip</button>` : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+function buyItem(category, itemId) {
+    const item = SHOP_ITEMS[category].find(i => i.id === itemId);
+    if (!item) return;
+    
+    if (appData.coins < item.price) {
+        showNotification('Not enough coins! 💰', 'linear-gradient(135deg, var(--danger), #dc2626)');
+        return;
+    }
+    
+    appData.coins -= item.price;
+    appData.inventory[category].push(item.icon);
+    updateLevelDisplay();
+    renderShop();
+    saveData();
+    showNotification(`Bought ${item.name}! 🎉`, 'linear-gradient(135deg, var(--success), #059669)');
+}
+
+function equipItem(type, icon) {
+    appData.inventory.equipped[type] = icon;
+    updateCharacterDisplay();
+    saveData();
+    showNotification(`Equipped ${icon}!`, 'linear-gradient(135deg, var(--primary), var(--secondary))');
+}
+
+function switchShopTab(tab) {
+    document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('shopCharacters').style.display = tab === 'characters' ? 'grid' : 'none';
+    document.getElementById('shopWeapons').style.display = tab === 'weapons' ? 'grid' : 'none';
+}
+
+function updateCharacterDisplay() {
+    const displayEl = document.getElementById('characterDisplay');
+    if (!displayEl) return;
+    const char = appData.inventory.equipped.character;
+    const weapon = appData.inventory.equipped.weapon;
+    displayEl.innerHTML = `${char}${weapon || ''}`;
+}
+
+function updateDate() {
+    document.getElementById('currentDate').textContent = new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('dayStreak').textContent = appData.streak;
+}
+
+function renderRoutine() {
+    document.getElementById('routineList').innerHTML = appData.routine.map(item => `
+        <div class="check-item ${item.done ? 'completed' : ''}" onclick="toggleRoutine('${item.id}')">
+            <div class="checkbox">${item.done ? '<i class="fa-solid fa-check"></i>' : ''}</div>
+            <span>${item.text}</span>
+        </div>
+    `).join('');
+    document.getElementById('routineProgress').textContent = Math.round((appData.routine.filter(r => r.done).length / appData.routine.length) * 100) + '%';
+}
+
+function toggleRoutine(id) {
+    const item = appData.routine.find(r => r.id === id);
+    item.done = !item.done;
+    if (item.done) addXP(10);
+    renderRoutine();
+    saveData();
+}
+
+function renderKohi() {
+    document.getElementById('kohiList').innerHTML = appData.kohi.map(item => `
+        <div class="check-item ${item.done ? 'completed' : ''}" onclick="toggleKohi('${item.id}')">
+            <div class="checkbox">${item.done ? '<i class="fa-solid fa-check"></i>' : ''}</div>
+            <span>${item.text}</span>
+        </div>
+    `).join('');
+}
+
+function toggleKohi(id) {
+    const item = appData.kohi.find(k => k.id === id);
+    item.done = !item.done;
+    if (item.done) {
+        appData.hexagon.INT = Math.max(appData.hexagon.INT, appData.kohi.filter(k => k.done).length * 15);
+        addXP(15);
+    }
+    renderKohi();
+    updateHexagonChart();
+    saveData();
+}
+
+function initHexagonChart() {
+    hexagonChart = new Chart(document.getElementById('hexagonChart'), {
+        type: 'radar',
+        data: {
+            labels: ['Strength', 'Spirit', 'Brain', 'Recovery', 'Joy', 'Willpower'],
+            datasets: [{
+                data: Object.values(appData.hexagon),
+                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                borderColor: '#45b7d1',
+                borderWidth: 3,
+                pointBackgroundColor: ['#ff6b6b', '#4ecdc4', '#45b7d1', '#9b59b6', '#ffa94d', '#fd79a8'],
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: { stepSize: 20, color: '#94a3b8', backdropColor: 'transparent' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    pointLabels: { color: '#f1f5f9', font: { size: 14, weight: 'bold' } }
+                }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+}
+
+function updateHexagonChart() {
+    hexagonChart.data.datasets[0].data = Object.values(appData.hexagon);
+    hexagonChart.update();
+    const total = Object.values(appData.hexagon).reduce((a, b) => a + b, 0);
+    document.getElementById('totalScore').textContent = total;
+    const avg = total / 6;
+    let grade = 'E', gradeClass = 'grade-E';
+    if (avg >= 90) { grade = 'S'; gradeClass = 'grade-S'; }
+    else if (avg >= 80) { grade = 'A'; gradeClass = 'grade-A'; }
+    else if (avg >= 70) { grade = 'B'; gradeClass = 'grade-B'; }
+    else if (avg >= 50) { grade = 'C'; gradeClass = 'grade-C'; }
+    else if (avg >= 30) { grade = 'D'; gradeClass = 'grade-D'; }
+    const gradeEl = document.getElementById('gradeDisplay');
+    gradeEl.textContent = grade;
+    gradeEl.className = 'grade-letter ' + gradeClass;
+    updateAllStats();
+}
+
+function updateAllStats() {
+    document.getElementById('statSTR').textContent = appData.hexagon.STR;
+    document.getElementById('statSPR').textContent = appData.hexagon.SPR;
+    document.getElementById('statINT').textContent = appData.hexagon.INT;
+    document.getElementById('statREC').textContent = appData.hexagon.REC;
+    document.getElementById('statJOY').textContent = appData.hexagon.JOY;
+    document.getElementById('statWIL').textContent = appData.hexagon.WIL;
+}
+
+function startTimer() {
+    if (timerRunning) return;
+    timerRunning = true;
+    timerInterval = setInterval(() => {
+        if (timerSeconds === 0) {
+            if (timerMinutes === 0) {
+                clearInterval(timerInterval);
+                timerRunning = false;
+                addXP(50);
+                showNotification('⏰ Focus session completed! +50 XP 🎉', 'linear-gradient(135deg, var(--accent), var(--secondary))');
+                return;
+            }
+            timerMinutes--;
+timerSeconds = 59;
+} else {
+timerSeconds--;
+}
+updateTimerDisplay();
+}, 1000);
+}
+function pauseTimer() {
+clearInterval(timerInterval);
+timerRunning = false;
+}
+function resetTimer() {
+clearInterval(timerInterval);
+timerRunning = false;
+timerMinutes = parseInt(document.getElementById('timerMode').value);
+timerSeconds = 0;
+updateTimerDisplay();
+}
+function changeTimerMode() {
+resetTimer();
+}
+function updateTimerDisplay() {
+document.getElementById('timerDisplay').textContent = ${String(timerMinutes).padStart(2, '0')}:${String(timerSeconds).padStart(2, '0')};
+}
+function selectRating(grade, value) {
+document.querySelectorAll('.rating-btn').forEach(btn => btn.classList.remove('active'));
+event.target.classList.add('active');
+appData.selectedRating = grade;
+appData.selectedRatingValue = value;
+}
+function openModal(type) {
+closeModal();
+appData.selectedRating = null;
+appData.selectedRatingValue = 0;
+document.querySelectorAll('.rating-btn').forEach(btn => btn.classList.remove('active'));
+document.getElementById(type + 'Modal').classList.add('active');
+}
+function closeModal() {
+document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+}
+function toggleWillpower(element) {
+element.classList.toggle('completed');
+}
+function updateSleepPreview() {
+const time = document.getElementById('sleepTime').value;
+if (!time) return;
+const [hours, minutes] = time.split(':').map(Number);
+let score = 0;
+if (hours < 23) score = 100;
+else if (hours === 23) score = 100 - Math.round(minutes * 0.33);
+else if (hours === 0) score = 80 - Math.round(minutes * 0.33);
+else if (hours === 1) score = 60 - Math.round(minutes * 0.5);
+else if (hours === 2) score = 30 - Math.round(minutes * 0.5);
+else if (hours >= 3 && hours < 12) score = 10;
+else score = 100;
+document.getElementById('sleepScorePreview').textContent = Math.max(0, Math.min(100, score));
+}
+function saveStudyLog() {
+const subject = document.getElementById('studySubject').options[document.getElementById('studySubject').selectedIndex].text;
+const topic = document.getElementById('studyTopic').value;
+const duration = document.getElementById('studyDuration').value;
+const location = document.getElementById('studyLocation').value;
+const notes = document.getElementById('studyNotes').value;
+if (!topic || !duration || !appData.selectedRating) {
+    alert('Please fill all fields and rate!');
+    return;
+}
+
+appData.hexagon.INT = Math.min(100, appData.hexagon.INT + appData.selectedRatingValue);
+addXP(appData.selectedRatingValue);
+appData.logs.unshift({
+    type: 'study',
+    timestamp: new Date().toLocaleString('vi-VN'),
+    data: { subject, topic, duration, location, notes, rating: appData.selectedRating, score: appData.selectedRatingValue }
+});
+
+document.getElementById('studyTopic').value = '';
+document.getElementById('studyDuration').value = '';
+document.getElementById('studyLocation').value = '';
+document.getElementById('studyNotes').value = '';
+
+updateHexagonChart();
+renderLogs();
+saveData();
+closeModal();
+showNotification(`+${appData.selectedRatingValue} Brain! 📚`, 'linear-gradient(135deg, var(--brain), #2563eb)');
+}
+function saveGymLog() {
+const gymDay = document.getElementById('gymDay').options[document.getElementById('gymDay').selectedIndex].text;
+const exercises = document.getElementById('gymExercises').value;
+const duration = document.getElementById('gymDuration').value;
+if (!exercises || !duration || !appData.selectedRating) {
+    alert('Please fill all fields and rate!');
+    return;
+}
+
+appData.hexagon.STR = Math.min(100, appData.hexagon.STR + appData.selectedRatingValue);
+addXP(appData.selectedRatingValue);
+appData.logs.unshift({
+    type: 'gym',
+    timestamp: new Date().toLocaleString('vi-VN'),
+    data: { gymDay, exercises, duration, rating: appData.selectedRating, score: appData.selectedRatingValue }
+});
+
+document.getElementById('gymExercises').value = '';
+document.getElementById('gymDuration').value = '';
+
+updateHexagonChart();
+renderLogs();
+saveData();
+closeModal();
+showNotification(`+${appData.selectedRatingValue} Strength! 💪`, 'linear-gradient(135deg, var(--strength), #dc2626)');
+}
+function saveSoulLog() {
+const g1 = document.getElementById('gratitude1').value;
+const g2 = document.getElementById('gratitude2').value;
+const g3 = document.getElementById('gratitude3').value;
+const meditation = document.getElementById('meditationNotes').value;
+if (!g1 || !g2 || !g3) {
+    alert('Write 3 gratitude items!');
+    return;
+}
+
+const bonus = meditation ? 50 : 30;
+appData.hexagon.SPR = Math.min(100, appData.hexagon.SPR + bonus);
+addXP(bonus);
+appData.logs.unshift({
+    type: 'soul',
+    timestamp: new Date().toLocaleString('vi-VN'),
+    data: { gratitude: [g1, g2, g3], meditation }
+});
+
+document.getElementById('gratitude1').value = '';
+document.getElementById('gratitude2').value = '';
+document.getElementById('gratitude3').value = '';
+document.getElementById('meditationNotes').value = '';
+
+updateHexagonChart();
+renderLogs();
+saveData();
+closeModal();
+showNotification(`+${bonus} Spirit! 🙏`, 'linear-gradient(135deg, var(--spirit), #059669)');
+}
+function saveJoyLog() {
+const type = document.getElementById('joyType').options[document.getElementById('joyType').selectedIndex].text;
+const title = document.getElementById('joyTitle').value;
+const content = document.getElementById('joyContent').value;
+if (!title || !content) {
+    alert('Fill all fields!');
+    return;
+}
+
+appData.hexagon.JOY = Math.min(100, appData.hexagon.JOY + 40);
+addXP(40);
+appData.logs.unshift({
+    type: 'joy',
+    timestamp: new Date().toLocaleString('vi-VN'),
+    data: { type, title, content }
+});
+
+document.getElementById('joyTitle').value = '';
+document.getElementById('joyContent').value = '';
+
+updateHexagonChart();
+renderLogs();
+saveData();
+closeModal();
+showNotification('+40 Joy! ✨', 'linear-gradient(135deg, var(--joy), #ea580c)');
+}
+function saveWillpowerCheck() {
+const checks = document.querySelectorAll('#willpowerModal .check-item.completed');
+if (checks.length === 0) {
+alert('Select at least 1!');
+return;
+}
+const bonus = checks.length * 25;
+appData.hexagon.WIL = Math.min(100, appData.hexagon.WIL + bonus);
+addXP(bonus);
+const items = Array.from(checks).map(c => c.querySelector('strong').textContent);
+
+appData.logs.unshift({
+    type: 'willpower',
+    timestamp: new Date().toLocaleString('vi-VN'),
+    data: { count: checks.length, items }
+});
+
+checks.forEach(c => c.classList.remove('completed'));
+
+updateHexagonChart();
+renderLogs();
+saveData();
+closeModal();
+showNotification(`+${bonus} Willpower! 🛡️`, 'linear-gradient(135deg, var(--willpower), #db2777)');
+}
+function saveSleepLog() {
+const time = document.getElementById('sleepTime').value;
+if (!time) {
+alert('Select sleep time!');
+return;
+}
+const [hours, minutes] = time.split(':').map(Number);
+let score = 0;
+if (hours < 23) score = 100;
+else if (hours === 23) score = 100 - Math.round(minutes * 0.33);
+else if (hours === 0) score = 80 - Math.round(minutes * 0.33);
+else if (hours === 1) score = 60 - Math.round(minutes * 0.5);
+else if (hours === 2) score = 30 - Math.round(minutes * 0.5);
+else if (hours >= 3 && hours < 12) score = 10;
+else score = 100;
+
+score = Math.max(0, Math.min(100, score));
+appData.hexagon.REC = score;
+addXP(score);
+
+appData.logs.unshift({
+    type: 'sleep',
+    timestamp: new Date().toLocaleString('vi-VN'),
+    data: { time, score }
+});
+
+updateHexagonChart();
+renderLogs();
+saveData();
+closeModal();
+showNotification(`+${score} Recovery! 🌙`, 'linear-gradient(135deg, var(--recovery), #7c3aed)');
+}
+function renderLogs(filter = 'all') {
+let logs = appData.logs;
+if (filter !== 'all') logs = logs.filter(l => l.type === filter);
+if (logs.length === 0) {
+    document.getElementById('logsContainer').innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 60px;">No logs yet! 🚀</div>';
+    return;
+}
+
+document.getElementById('logsContainer').innerHTML = logs.slice(0, 30).map(log => {
+    let content = '', borderColor = 'var(--accent)';
+    
+    if (log.type === 'study') {
+        borderColor = 'var(--brain)';
+        content = `<strong>📚 ${log.data.subject} - ${log.data.topic}</strong><br>
+            <div style="margin-top: 8px; color: var(--text-muted);">⏱️ ${log.data.duration}min • 📍 ${log.data.location} • 
+            <span style="color: var(--brain); font-weight: 700;">Grade: ${log.data.rating}</span> (+${log.data.score})</div>
+            ${log.data.notes ? `<div style="margin-top: 10px; font-style: italic;">"${log.data.notes}"</div>` : ''}`;
+    } else if (log.type === 'gym') {
+        borderColor = 'var(--strength)';
+        content = `<strong>💪 ${log.data.gymDay}</strong><br>
+            <div style="margin-top: 8px; color: var(--text-muted);">⏱️ ${log.data.duration}min • 
+            <span style="color: var(--strength); font-weight: 700;">Grade: ${log.data.rating}</span> (+${log.data.score})</div>
+            <pre style="margin-top: 10px; color: var(--text-muted); white-space: pre-wrap; font-family: inherit;">${log.data.exercises}</pre>`;
+    } else if (log.type === 'soul') {
+        borderColor = 'var(--spirit)';
+        content = `<strong>🙏 Gratitude</strong><br>
+            <ul style="margin-top: 10px; padding-left: 20px; line-height: 1.8;">${log.data.gratitude.map(i => `<li>${i}</li>`).join('')}</ul>
+            ${log.data.meditation ? `<div style="margin-top: 10px; font-style: italic;">🧘 ${log.data.meditation}</div>` : ''}`;
+    } else if (log.type === 'joy') {
+        borderColor = 'var(--joy)';
+        content = `<strong>✨ ${log.data.type} - ${log.data.title}</strong><br>
+            <div style="margin-top: 10px; line-height: 1.6;">${log.data.content}</div>`;
+    } else if (log.type === 'willpower') {
+        borderColor = 'var(--willpower)';
+        content = `<strong>🛡️ Willpower (${log.data.count}/4)</strong><br>
+            <ul style="margin-top: 10px; padding-left: 20px; line-height: 1.8;">${log.data.items.map(i => `<li>${i}</li>`).join('')}</ul>`;
+    } else if (log.type === 'sleep') {
+        borderColor = 'var(--recovery)';
+        content = `<strong>🌙 Bedtime: ${log.data.time}</strong><br>
+            <div style="margin-top: 8px;"><span style="color: var(--recovery); font-weight: 700;">Score: ${log.data.score}/100</span></div>`;
+    }
+
+    return `<div class="log-item" style="border-left-color: ${borderColor};">
+        <div class="log-time">${log.timestamp}</div>${content}</div>`;
+}).join('');
+}
+function switchLogTab(filter) {
+document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+event.target.classList.add('active');
+renderLogs(filter);
+}
+function showNotification(text, gradient) {
+const notif = document.createElement('div');
+notif.className = 'notification';
+notif.style.background = gradient;
+notif.textContent = text;
+document.body.appendChild(notif);
+setTimeout(() => notif.remove(), 3000);
+}
+init();
+setInterval(saveData, 30000);
+document.querySelectorAll('.modal').forEach(m => {
+m.addEventListener('click', e => { if (e.target === m) closeModal(); });
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
 </script>
     </div>
 </body>
